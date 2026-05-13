@@ -104,7 +104,7 @@ function TVListaViewCompact() {
     <div className="h-full w-full flex flex-col" style={{ display: "grid", gridTemplateRows: "65% 35%", gridTemplateColumns: "1fr", gap: "8px", padding: "8px" }}>
       
       {/* PLAYING COUPLES - 70% */}
-      <div className="flex flex-wrap gap-3 justify-between overflow-hidden">
+      <div className="flex flex-wrap gap-3 justify-evenly">
         {partidosRonda.map((partido) => (
           <div
             key={partido.id}
