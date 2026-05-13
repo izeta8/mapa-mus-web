@@ -3,6 +3,8 @@
 import { useState, use, useEffect } from "react";
 import { ViewMode, Partido, Ronda } from "@/types/tournament";
 import { mockPartidos, mockByes, NUM_PAREJAS, DEBE_MOSTRAR_LISTA } from "@/data/mock-tournament";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Network, StretchHorizontal } from "lucide-react";
 
 interface Props {
   params: Promise<{ "id-torneo": string }>;
@@ -24,12 +26,33 @@ export default function TVTournamentPage({ params }: Props) {
             <span className="text-2xl font-black text-zinc-700">{NUM_PAREJAS}</span>
           </div>
         </div>
-        <button
-          onClick={() => setViewMode(viewMode === "lista" ? "bracket" : "lista")}
-          className="px-4 py-2 bg-zinc-200 hover:bg-zinc-300 font-bold text-sm transition-colors"
-        >
-          {viewMode === "lista" ? "Ver Árbol" : "Ver Lista"}
-        </button>
+     
+        <Tabs defaultValue="lista">
+          <TabsList>
+
+            {/* PAREJAS */}
+            <TabsTrigger  
+              value="lista" 
+              className="p-4 pointer"
+              onClick={() => setViewMode("lista")}
+            >
+              <StretchHorizontal />
+              Parejas
+            </TabsTrigger>
+            
+            {/* CUADRO */}
+            <TabsTrigger  
+              value="bracket" 
+              className="p-4 pointer"
+              onClick={() => setViewMode("bracket")}
+            >
+              <Network/>
+              Cuadro
+            </TabsTrigger>
+          
+          </TabsList>
+        </Tabs>
+
       </header>
 
       <div className="flex-1 overflow-hidden">
