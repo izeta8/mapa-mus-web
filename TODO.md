@@ -1,0 +1,2 @@
+
+Seguridad RLS: Cuando se implemente la autenticacion B2B, actualizar las políticas RLS de Supabase. Cambiar la validación genérica (auth.role() = 'authenticated') para verificar que el auth.uid() del usuario coincide exactamente con el organizer_id del torneo, asegurando que nadie pueda editar torneos ajenos.

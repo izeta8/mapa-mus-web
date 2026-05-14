@@ -1,8 +1,3 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
 
 # Mapa Mus Web - Contexto del Proyecto
 
@@ -41,13 +36,13 @@ Ecosistema híbrido (físico/digital) para torneos de Mus:
 - `/admin/panel/[id-torneo]` - Dashboard de gestión del torneo
 
 ### `(public-tv)` - Layout vacío, 100% viewport
-- `/tv/[id-torneo]` - Interfaz oscura de alto contraste para TV del bar
+- `/tv/[id-torneo]` - Interfaz para TV del bar donde muestran los emparejamientos
 
 ## Consideraciones de UX
 
 - **Entorno ruidoso**: Los organizadores usan la tablet en bares con ruido, presión y poco tiempo
 - **UI mínima**: Botones grandes, flujos reducidos, información escaneable rápido
-- **Modo TV**: Alto contraste, texto gigante, legible desde lejos, sin interacciones manuales
+- **Modo TV**: Texto gigante, legible desde lejos
 
 ## Estado Actual del Proyecto
 
