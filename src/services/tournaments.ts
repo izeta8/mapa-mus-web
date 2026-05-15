@@ -9,10 +9,11 @@ export async function getTournamentByShortId(shortId: string): Promise<Tournamen
         .from('tournaments_develop')
         .select("*")
         .eq('short_id', shortId)
-        .single()
+        .maybeSingle()
 
     if (error) {
-        throw new Error("Ha habido un error al obtener los datos del torneo")
+        console.error(error);
+        return null;
     }
 
     return tournament;
