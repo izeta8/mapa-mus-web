@@ -1,15 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { mockPartidos, mockByes } from "@/data/mock-tournament";
 import { getFontSize } from "../helpers";
+import { Match } from "@/types/database";
+import { MatchupCardStyles } from "@/types";
 
+interface Props {
+  matches: Match[],
+}
 
-export default function TVListaViewCompact() {
+export default function TVMatchupView({matches}: Props) {
   
-  const rondaActual = "1/32";
-  const partidosRonda = mockPartidos.filter(p => p.ronda === rondaActual);
-  const byes = mockByes.filter(p => p.ronda === rondaActual);
+  const playingMatches = matches.filter(m => !m.is_bye);
+  const byes           = matches.filter(m =>  m.is_bye);
 
   const [dimensions, setDimensions] = useState({ width: 1200, height: 800 });
   
@@ -22,26 +25,20 @@ export default function TVListaViewCompact() {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  const partidoStyles = getFontSize(partidosRonda.length, "partido", dimensions.width);
-  const byeStyles = getFontSize(byes.length, "bye", dimensions.width, dimensions.height);
+  const playingMatchStyles = getFontSize(playingMatches.length, "partido", dimensions.width);
+  const byeMatchStyles     = getFontSize(byes.length, "bye", dimensions.width, dimensions.height);
 
   return (
     <div className="h-full w-full flex flex-col" style={{ display: "grid", gridTemplateRows: "65% 35%", gridTemplateColumns: "1fr", gap: "8px", padding: "8px" }}>
       
       {/* PLAYING COUPLES - 70% */}
       <div className="flex flex-wrap gap-3 justify-evenly">
-        {partidosRonda.map((partido) => (
-          <div
-            key={partido.id}
-            className={`flex flex-col items-center justify-center border-2 border-black bg-white shadow-md ${partidoStyles.container}`}
-          >
-            <div className={`font-bold text-zinc-400 mb-1 ${partidoStyles.mesa}`}>MESA {partido.mesa}</div>
-            <div className="flex items-center gap-3">
-              <span className={`font-black text-zinc-900 ${partidoStyles.numero}`}>{partido.parejaA}</span>
-              <span className={`font-bold text-zinc-300 ${partidoStyles.vs}`}>vs</span>
-              <span className={`font-black text-zinc-900 ${partidoStyles.numero}`}>{partido.parejaB}</span>
-            </div>
-          </div>
+        {playingMatches.map((match) => (
+          <MatchupCard 
+            key={match.id}
+            match={match}
+            playingMatchStyles={playingMatchStyles}
+          />
         ))}
       </div>
 
@@ -59,9 +56,9 @@ export default function TVListaViewCompact() {
               {byes.map((bye) => (
                 <div
                   key={bye.id}
-                  className={`border border-zinc-400 bg-white text-center ${byeStyles.container}`}
+                  className={`border border-zinc-400 bg-white text-center ${byeMatchStyles.container}`}
                 >
-                  <span className={`font-black text-zinc-800 text-xl ${byeStyles.numero}`}>{bye.pareja}</span>
+                  <span className={`font-black text-zinc-800 text-xl ${byeMatchStyles.numero}`}>{bye.couple1_id}</span>
                 </div>
               ))}
             </div>
@@ -81,4 +78,26 @@ export default function TVListaViewCompact() {
 
     </div>
   );
+}
+
+interface MatchupCardProps {
+  match: Match,
+  playingMatchStyles: MatchupCardStyles
+}
+
+export const MatchupCard = ({match, playingMatchStyles}: MatchupCardProps) => {
+
+  return (
+    <div
+      className={`flex flex-col items-center justify-center border-2 border-black bg-white shadow-md ${playingMatchStyles.container}`}
+    >
+      <div className={`font-bold text-zinc-400 mb-1 ${playingMatchStyles.mesa}`}>MESA {match.table_number}</div>
+      <div className="flex items-center gap-3">
+        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero}`}>{match.couple1_id}</span>
+        <span className={`font-bold text-zinc-300 ${playingMatchStyles.vs}`}>vs</span>
+        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero}`}>{match.couple2_id}</span>
+      </div>
+    </div>
+  )
+
 }

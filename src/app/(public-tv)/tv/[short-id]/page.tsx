@@ -21,6 +21,8 @@ export default async function Page({ params }: Props) {
   return (
       <TVTournamentPage 
         tournamentName={tournamentData.name}
+        matches={tournamentData.matches}
+        inscribedCouples={tournamentData.total_couples}
       />
   );
 }

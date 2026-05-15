@@ -1,35 +1,54 @@
 "use client"
 
-import { ViewMode } from "@/types/database";
-import TVBracketViewFull from "./TVBracketViewFull";
+import { Match, ViewMode } from "@/types/database";
+import TVBracketView from "./TVBracketView";
 import TVHeader from "./TVHeader";
-import TVListaViewCompact from "./TVListaViewCompact";
-import { mockPartidos, NUM_PAREJAS, DEBE_MOSTRAR_LISTA } from "@/data/mock-tournament";
+import TVMatchupView from "./TVMatchupView";
 import { useState } from "react";
 
 interface Props {
   tournamentName: string,
+  matches: Match[],
+  inscribedCouples: number
 }
 
-export default function TVTournamentPage({ tournamentName }: Props) {
+export default function TVTournamentPage({ tournamentName, matches, inscribedCouples }: Props) {
 
-  const [viewMode, setViewMode] = useState<ViewMode>(DEBE_MOSTRAR_LISTA ? "lista" : "bracket");
+  const shouldShowMatchupView = matches.length >= 32;
+  const [viewMode, setViewMode] = useState<ViewMode>(shouldShowMatchupView ? "matchup" : "bracket");
+  const isBracketCreated = matches && matches.length > 0;
 
   return (
     <div className="h-screen bg-zinc-50 text-black p-4 flex flex-col ">
+
       <TVHeader 
         tournamentName={tournamentName} 
         setViewMode={setViewMode} 
-        numParejas={NUM_PAREJAS}
+        inscribedCouples={inscribedCouples}
+        isBracketCreated={isBracketCreated}
       />
 
-      <div className="flex-1 overflow-hidden">
-        {viewMode === "lista" ? (
-          <TVListaViewCompact />
-        ) : (
-          <TVBracketViewFull partidos={mockPartidos} />
-        )}
+      {!isBracketCreated ? (
+        <div className=" h-full w-full flex justify-center items-center">
+          <a className="text-3xl">El cuadro no ha sido generado</a>
+        </div>
+      ) : (
+        <>
+        <div className="flex-1 overflow-hidden">
+          {viewMode === "matchup" ? (
+            <TVMatchupView
+              matches={matches}
+            />
+          ) : (
+            <TVBracketView 
+              matches={matches}
+            />
+          )}
       </div>
+        </>
+
+      )}
+
     </div>
   );
 }

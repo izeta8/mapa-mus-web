@@ -1,5 +1,6 @@
+import { MatchupCardStyles } from "@/types";
 
-export function getFontSize(totalItems: number, type: "partido" | "bye", containerWidth: number, containerHeight?: number): { container: string; numero: string; mesa: string; vs: string; badge: string } {
+export function getFontSize(totalItems: number, type: "partido" | "bye", containerWidth: number, containerHeight?: number): MatchupCardStyles {
   const gap = 12;
   
   const isBye = type === "bye";
@@ -10,7 +11,6 @@ export function getFontSize(totalItems: number, type: "partido" | "bye", contain
   if (isBye && containerHeight) {
     const maxRows = 2;
     const maxRowsHeight = containerHeight * 0.25;
-    const rowHeight = 60;
     const actualRows = Math.min(rows, maxRows);
     const availableRowsHeight = maxRowsHeight - (actualRows * gap);
     const cardHeight = availableRowsHeight / actualRows;

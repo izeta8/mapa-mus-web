@@ -1,20 +1,40 @@
 import { createClient } from "@/lib/supabase/server";
-import { Tournament } from "@/types/database";
+import { TournamentFull } from "@/types/database";
 
-export async function getTournamentByShortId(shortId: string): Promise<Tournament | null> {
+export async function getTournamentByShortId(shortId: string): Promise<TournamentFull | null> {
   
     const supabase = await createClient();
 
-    const { data: tournament, error } = await supabase
+    const { data, error } = await supabase
         .from('tournaments_develop')
-        .select("*")
+        .select(`
+        *,
+        matches (
+            *,
+            couple1:couples!couple1_id (
+            player1_name,
+            player2_name,
+            couple_number
+            ),
+            couple2:couples!couple2_id (
+            player1_name,
+            player2_name,
+            couple_number
+            )
+        ),
+        stats:couples(count)
+        `)
         .eq('short_id', shortId)
-        .maybeSingle()
+        .maybeSingle();
 
-    if (error) {
+    if (error || !data) {
         console.error(error);
         return null;
     }
 
-    return tournament;
+    return {
+        ...data,
+        total_couples: data.stats?.[0]?.count ?? 0,
+    };
 }
+

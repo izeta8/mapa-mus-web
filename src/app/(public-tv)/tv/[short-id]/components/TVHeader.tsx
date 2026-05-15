@@ -5,7 +5,8 @@ import { Network, StretchHorizontal } from "lucide-react";
 interface TVHeaderProps {
   tournamentName: string;
   setViewMode: (viewMode: ViewMode) => void;
-  numParejas: number;
+  inscribedCouples: number;
+  isBracketCreated: boolean;
 }
 
 interface TVModeSelectorProps {
@@ -13,7 +14,7 @@ interface TVModeSelectorProps {
 }
 
 
-export default function TVHeader({tournamentName, setViewMode, numParejas}: TVHeaderProps) {
+export default function TVHeader({tournamentName, setViewMode, inscribedCouples, isBracketCreated}: TVHeaderProps) {
 
   return (
     <header className="flex justify-between items-center shrink-0 mb-4">
@@ -23,11 +24,13 @@ export default function TVHeader({tournamentName, setViewMode, numParejas}: TVHe
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-bold text-zinc-500">TOTAL PAREJAS</span>
-            <span className="text-2xl font-black text-zinc-700">{numParejas}</span>
+            <span className="text-2xl font-black text-zinc-700">{inscribedCouples}</span>
           </div>
         </div>
      
-        <TVModeSelector setViewMode={setViewMode} />
+        {isBracketCreated && (
+          <TVModeSelector setViewMode={setViewMode} />
+        )}
 
       </header>
   )
@@ -37,17 +40,17 @@ export default function TVHeader({tournamentName, setViewMode, numParejas}: TVHe
 function TVModeSelector({ setViewMode }: TVModeSelectorProps) {
 
   return (
-    <Tabs defaultValue="lista">
+    <Tabs defaultValue="matchup">
       <TabsList>
 
         {/* PAREJAS */}
         <TabsTrigger  
-          value="lista" 
+          value="matchup" 
           className="p-4 pointer"
-          onClick={() => setViewMode("lista")}
+          onClick={() => setViewMode("matchup")}
         >
           <StretchHorizontal />
-          Parejas
+          Enfrentamientos
         </TabsTrigger>
         
         {/* CUADRO */}
