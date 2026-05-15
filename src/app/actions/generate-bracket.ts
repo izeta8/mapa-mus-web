@@ -24,6 +24,14 @@ export async function fetchTournamentCouples(tournamentId: number): Promise<Coup
 }
 
 export async function storeGeneratedBracket(tournamentId: number, bracket: MatchInsert[]) {
+
+    /**
+     * TODO: SECURITY CHECK (Pending Auth Implementation)
+     * 1. Obtener sesión: const { data: { user } } = await supabase.auth.getUser();
+     * 2. Validar propiedad: Verificar que user.id === tournament.organizer_id
+     * 3. Abortar si no es el dueño para evitar ataques de enumeración de IDs.
+     */
+
     const supabase = await createClient();
 
     // Clear a possible previous bracket before inserting the new one
