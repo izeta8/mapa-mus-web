@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, use } from "react";
-import { ViewMode, Partido, Ronda } from "@/types/tournament";
+import { ViewMode, Match, Round } from "@/types/database";
 import { mockPartidos, NUM_PAREJAS, DEBE_MOSTRAR_LISTA } from "@/data/mock-tournament";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,14 +13,14 @@ interface Props {
 
 export default function TournamentDetailPage({ params }: Props) {
   const { "id-torneo": idTorneo } = use(params);
-  const [partidos, setPartidos] = useState<Partido[]>(mockPartidos);
+  const [partidos, setPartidos] = useState<Match[]>(mockPartidos);
   const [viewMode, setViewMode] = useState<ViewMode>(DEBE_MOSTRAR_LISTA ? "lista" : "bracket");
   
   const [parejaA, setParejaA] = useState("");
   const [parejaB, setParejaB] = useState("");
   const [mesa, setMesa] = useState("");
 
-  const getRondaActual = (): Ronda => {
+  const getRondaActual = (): Round => {
     const activeMatches = partidos.filter(p => p.ganador === null && p.parejaA !== null && p.parejaB !== null);
     if (activeMatches.length > 0) {
       return activeMatches[0].ronda;
@@ -31,8 +31,8 @@ export default function TournamentDetailPage({ params }: Props) {
   const handleAddPartido = () => {
     if (!parejaA || !parejaB || !mesa) return;
     const newId = Math.max(...partidos.map(p => p.id)) + 1;
-    const ronda: Ronda = getRondaActual();
-    const newPartido: Partido = {
+    const ronda: Round = getRondaActual();
+    const newPartido: Match = {
       id: newId,
       ronda,
       parejaA: parseInt(parejaA),
@@ -164,9 +164,9 @@ export default function TournamentDetailPage({ params }: Props) {
   );
 }
 
-function BracketView({ partidos }: { partidos: Partido[] }) {
-  const rondas: Ronda[] = ["1/16", "1/8", "1/4", "1/2", "Final"];
-  const getPartidosPorRonda = (ronda: Ronda) => partidos.filter(p => p.ronda === ronda);
+function BracketView({ partidos }: { partidos: Match[] }) {
+  const rondas: Round[] = ["1/16", "1/8", "1/4", "1/2", "Final"];
+  const getPartidosPorRonda = (ronda: Round) => partidos.filter(p => p.ronda === ronda);
 
   return (
     <div className="flex gap-8 overflow-x-auto pb-4">

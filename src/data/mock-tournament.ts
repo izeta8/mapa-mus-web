@@ -1,4 +1,4 @@
-import { Partido } from "@/types/tournament";
+import { Match } from "@/types/database";
 
 export interface Bye {
   id: number;
@@ -16,7 +16,7 @@ function generarPartidos32(): { a: number; b: number; mesa: number }[] {
 
 const partidos32 = generarPartidos32();
 
-export const mockPartidos: Partido[] = [
+export const mockPartidos: Match[] = [
   ...partidos32.map((p, i) => ({
     id: i + 1,
     ronda: "1/32" as const,
