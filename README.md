@@ -1,6 +1,6 @@
 # Actualizar tipos supabase
 ```bash
-$env:SUPABASE_ACCESS_TOKEN="sbp_41aa304f761a356f7fcbb9b51d37dc962f552620"
+$env:SUPABASE_ACCESS_TOKEN="el token"
 npx supabase gen types typescript --project-id "yqjtuultqqedksqrkejl" > "src\types\supabase.ts"
 ```
 
