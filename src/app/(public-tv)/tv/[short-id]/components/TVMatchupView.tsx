@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { getFontSize } from "../helpers";
-import { MatchWithCouples } from "@/types/database";
+import { MatchWithCouples, TournamentFull } from "@/types/database";
 import { MatchupCardStyles } from "@/types";
 
 interface Props {
   matches: MatchWithCouples[],
+  tournament: TournamentFull,
 }
 
-export default function TVMatchupView({matches}: Props) {
+export default function TVMatchupView({matches, tournament}: Props) {
   
-  // The active round is the highest round (furthest from the final) that still has matches
-  // that are not completed (or the first round if everything is just starting).
-  const activeRound = Math.max(...matches.filter(m => m.status !== 'completed' || m.is_bye).map(m => m.round), 1);
+  // TV now follows the organizer's current_round
+  const activeRound = tournament.current_round || Math.max(...matches.map(m => m.round), 1);
 
-  // Filter matches to show ONLY those from the round that should be displayed on TV
+  // Filter matches to show only those from the current TV round
   const currentRoundMatches = matches.filter(m => m.round === activeRound);
 
   // Matches being played (have two couples)

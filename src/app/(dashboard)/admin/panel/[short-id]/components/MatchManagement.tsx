@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TournamentFull, MatchWithCouples } from "@/types/database";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrophyIcon, MapPinIcon, CheckIcon, Loader2Icon, Undo2Icon } from "lucide-react";
-import { updateMatchTable, setMatchWinner, rollbackMatchWinner } from "@/app/actions/tournaments";
+import { TrophyIcon, MapPinIcon, CheckIcon, Loader2Icon, Undo2Icon, ChevronRightIcon } from "lucide-react";
+import { updateMatchTable, setMatchWinner, rollbackMatchWinner, advanceTournamentRound } from "@/app/actions/tournaments";
 import { toast } from "sonner";
 
 interface Props {
@@ -15,33 +15,81 @@ interface Props {
 }
 
 export function MatchManagement({ tournament }: Props) {
-
-  // Get all unique rounds from the matches
+  
+  // Obtener todas las rondas únicas de los partidos
   const rounds = Array.from(new Set(tournament.matches.map(m => m.round))).sort((a, b) => b - a);
   
-  // The default active round is the highest one that has incomplete matches
-  const defaultRound = Math.max(...tournament.matches.filter(m => m.status !== 'completed' || m.is_bye).map(m => m.round), rounds[0] || 1);
+  // La ronda del torneo que manda (lo que ve la TV)
+  const tournamentCurrentRound = tournament.current_round || rounds[0] || 1;
   
-  const [activeTab, setActiveRound] = useState(defaultRound.toString());
+  // Estado local para la pestaña que estamos mirando el organizador
+  const [activeTab, setActiveTab] = useState(tournamentCurrentRound.toString());
+  const [isAdvancing, setIsAdvancing] = useState(false);
+
+  // Sincronizar la pestaña si el torneo cambia externamente (ej: otro admin avanza ronda)
+  useEffect(() => {
+    setActiveTab(tournamentCurrentRound.toString());
+  }, [tournamentCurrentRound]);
+
+  // Verificar si la ronda que estamos mirando está completa
+  const currentTabMatches = tournament.matches.filter(m => m.round === parseInt(activeTab));
+  const isRoundComplete = currentTabMatches.length > 0 && currentTabMatches.every(m => m.status === 'completed' || m.is_bye);
+  
+  // Verificar si es la ronda que está actualmente "en la TV"
+  const isViewingCurrentTournamentRound = parseInt(activeTab) === tournamentCurrentRound;
+
+  const handleAdvanceRound = async () => {
+    const nextRound = tournamentCurrentRound - 1;
+    if (nextRound < 1) {
+      toast.info("¡Este es el último partido del torneo!");
+      return;
+    }
+
+    setIsAdvancing(true);
+    const result = await advanceTournamentRound(tournament.id, nextRound);
+    setIsAdvancing(false);
+
+    if (result.success) {
+      toast.success(`Ronda ${nextRound} anunciada en TV`);
+    } else {
+      toast.error("Error: " + result.error);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
-      <Tabs value={activeTab} onValueChange={setActiveRound} className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="flex items-center justify-between mb-6">
           <TabsList className="bg-muted/50 p-1 h-12">
             {rounds.map((round) => (
               <TabsTrigger 
                 key={round} 
                 value={round.toString()}
-                className="px-6 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                className="px-6 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm flex items-center gap-2"
               >
                 Ronda {round}
+                {round === tournamentCurrentRound && (
+                  <span className="size-2 bg-emerald-500 rounded-full animate-pulse" title="Ronda en TV" />
+                )}
               </TabsTrigger>
             ))}
           </TabsList>
           
-          <div className="text-sm font-medium text-muted-foreground bg-muted px-4 py-2 rounded-full border">
-            Estado: <span className="text-primary font-bold">En Juego (Live)</span>
+          <div className="flex items-center gap-4">
+             {isRoundComplete && isViewingCurrentTournamentRound && tournamentCurrentRound > 1 && (
+               <Button 
+                onClick={handleAdvanceRound} 
+                disabled={isAdvancing}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 px-6 shadow-lg animate-in zoom-in-95 duration-300"
+               >
+                 {isAdvancing ? <Loader2Icon className="size-5 animate-spin mr-2" /> : <ChevronRightIcon className="size-5 mr-2" />}
+                 Anunciar Ronda {tournamentCurrentRound - 1} en TV
+               </Button>
+             )}
+             
+             <div className="text-sm font-medium text-muted-foreground bg-muted px-4 py-2 rounded-full border">
+                TV mostrando: <span className="text-primary font-bold">Ronda {tournamentCurrentRound}</span>
+             </div>
           </div>
         </div>
 
@@ -63,25 +111,11 @@ export function MatchManagement({ tournament }: Props) {
 }
 
 function MatchCard({ match }: { match: MatchWithCouples }) {
-  const [table, setTable] = useState(match.table_number || "");
-  const [isUpdatingTable, setIsUpdatingTable] = useState(false);
   const [isSettingWinner, setIsSettingWinner] = useState<string | null>(null);
   const [isRollingBack, setIsRollingBack] = useState(false);
 
   const isCompleted = match.status === 'completed';
   const isBye = match.is_bye;
-
-  const handleTableUpdate = async () => {
-    if (table === match.table_number) return;
-    setIsUpdatingTable(true);
-    const result = await updateMatchTable(match.id, table || null);
-    setIsUpdatingTable(false);
-    if (result.success) {
-      toast.success("Mesa actualizada");
-    } else {
-      toast.error("Error: " + result.error);
-    }
-  };
 
   const handleSetWinner = async (coupleId: string) => {
     // Si ya había un ganador, primero deshacemos (limpieza automática)
@@ -136,22 +170,13 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
   return (
     <Card className={`overflow-hidden transition-all border-2 ${isCompleted ? 'bg-muted/5' : 'bg-background hover:border-primary/30 shadow-sm'}`}>
       <CardContent className="p-0 flex flex-col md:flex-row">
-        
-        {/* Mesa Info */}
-        <div className="w-full md:w-48 bg-muted/50 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-dashed">
-          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-1">
+        {/* Mesa Info (Solo Lectura) */}
+        <div className="w-1/2 md:w-48 bg-muted/50 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-dashed">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-1 flex items-center gap-1">
             <MapPinIcon className="size-3" /> Mesa
           </label>
-          <div className="flex items-center gap-2">
-            <Input 
-              value={table}
-              onChange={(e) => setTable(e.target.value)}
-              onBlur={handleTableUpdate}
-              placeholder="--"
-              className="h-12 w-20 text-center text-2xl font-black bg-background border-2"
-              disabled={isCompleted}
-            />
-            {isUpdatingTable && <Loader2Icon className="size-4 animate-spin text-primary" />}
+          <div className="text-4xl font-black text-foreground">
+            {match.table_number || "--"}
           </div>
         </div>
 
@@ -182,16 +207,16 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
                   <Undo2Icon className="size-3 mr-1" /> {isRollingBack ? "..." : "Deshacer"}
                 </Button>
               </div>
-            ) : (
+            ) : !isCompleted ? (
               <Button 
                 onClick={() => match.couple1_id && handleSetWinner(match.couple1_id)}
                 disabled={!!isSettingWinner || isRollingBack || !match.couple1_id || !match.couple2_id}
                 className="w-full font-bold h-10"
-                variant={isCompleted ? "ghost" : "outline"}
+                variant="outline"
               >
-                {isSettingWinner === match.couple1_id ? <Loader2Icon className="size-4 animate-spin" /> : isCompleted ? "Corregir" : "Gana"}
+                {isSettingWinner === match.couple1_id ? <Loader2Icon className="size-4 animate-spin" /> : "Gana"}
               </Button>
-            )}
+            ) : null}
           </div>
 
           <div className="text-3xl font-black text-muted-foreground/20 italic">VS</div>
@@ -203,7 +228,7 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
             </div>
             <div className="text-center">
               <p className="font-bold text-xl leading-tight truncate max-w-[150px]">{match.couple2?.player1_name}</p>
-              <p className="font-bold text-xl leading-tight truncate max-w-[150px]">{match.couple2?.player2_name}</p>
+              <p className="font-bold text-xl leading-tight text-muted-foreground truncate max-w-[150px]">{match.couple2?.player2_name}</p>
             </div>
 
             {match.winner_id === match.couple2_id ? (
@@ -221,16 +246,16 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
                   <Undo2Icon className="size-3 mr-1" /> {isRollingBack ? "..." : "Deshacer"}
                 </Button>
               </div>
-            ) : (
+            ) : !isCompleted ? (
               <Button 
                 onClick={() => match.couple2_id && handleSetWinner(match.couple2_id)}
                 disabled={!!isSettingWinner || isRollingBack || !match.couple1_id || !match.couple2_id}
                 className="w-full font-bold h-10"
-                variant={isCompleted ? "ghost" : "outline"}
+                variant="outline"
               >
-                {isSettingWinner === match.couple2_id ? <Loader2Icon className="size-4 animate-spin" /> : isCompleted ? "Corregir" : "Gana"}
+                {isSettingWinner === match.couple2_id ? <Loader2Icon className="size-4 animate-spin" /> : "Gana"}
               </Button>
-            )}
+            ) : null}
           </div>
         </div>
       </CardContent>

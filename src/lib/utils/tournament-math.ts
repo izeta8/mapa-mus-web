@@ -112,7 +112,5 @@ export const coupleAsignation = (matchesToInsert: MatchInsert[], tournamentRound
 
     });
 
-    console.log(lastRoundMatches)
-
     return matchesToInsert;
 }

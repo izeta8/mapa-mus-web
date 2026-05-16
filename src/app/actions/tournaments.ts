@@ -104,11 +104,28 @@ export async function updateTournamentStatus(tournamentId: string, status: 'ongo
     const { error } = await supabase
         .from('tournaments_develop')
         .update({ status })
-        .eq('id', tournamentId);
-
+        .eq('id', tournamentId)
+        
     if (error) {
         console.error("Error al actualizar el estado del torneo:", error.message);
         throw new Error('No se pudo cambiar el estado del torneo');
     }
     
+}
+
+export async function advanceTournamentRound(tournamentId: string, round: number) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('tournaments_develop')
+    .update({ current_round: round })
+    .eq('id', tournamentId);
+
+  if (error) {
+    console.error("Error advancing round:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath(`/admin/panel/[short-id]`, 'page');
+  return { success: true };
 }

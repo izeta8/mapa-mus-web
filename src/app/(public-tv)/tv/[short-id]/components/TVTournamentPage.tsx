@@ -1,18 +1,20 @@
 "use client"
 
-import { MatchWithCouples, ViewMode } from "@/types/database";
+import { MatchWithCouples, ViewMode, TournamentFull } from "@/types/database";
 import TVBracketView from "./TVBracketView";
 import TVHeader from "./TVHeader";
 import TVMatchupView from "./TVMatchupView";
 import { useState } from "react";
 
 interface Props {
-  tournamentName: string,
-  matches: MatchWithCouples[],
-  inscribedCouples: number
+  tournament: TournamentFull
 }
 
-export default function TVTournamentPage({ tournamentName, matches, inscribedCouples }: Props) {
+export default function TVTournamentPage({ tournament }: Props) {
+
+  const matches = tournament.matches;
+  const inscribedCouples = tournament.couples.length;
+  const tournamentName = tournament.name;
 
   const shouldShowMatchupView = matches.length >= 32;
   const [viewMode, setViewMode] = useState<ViewMode>("matchup");
@@ -38,13 +40,9 @@ export default function TVTournamentPage({ tournamentName, matches, inscribedCou
         <>
         <div className="flex-1 overflow-hidden">
           {viewMode === "matchup" ? (
-            <TVMatchupView
-              matches={matches}
-            />
+            <TVMatchupView matches={matches} tournament={tournament} />
           ) : (
-            <TVBracketView 
-              matches={matches}
-            />
+            <TVBracketView matches={matches} />
           )}
       </div>
         </>
