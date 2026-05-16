@@ -19,7 +19,7 @@ export default function TVMatchupView({matches}: Props) {
   const currentRoundMatches = matches.filter(m => m.round === activeRound);
 
   // Matches being played (have two couples)
-  const playingMatches = currentRoundMatches.filter(m => !m.is_bye && m.couple1 && m.couple2);
+  const playingMatches = currentRoundMatches.filter(m => !m.is_bye && m.couple1 && m.couple2).sort((a,b) => Number(a.table_number) - Number(b.table_number));
   
   // Couples that advance directly in THIS ROUND (are byes at this level)
   const byes = currentRoundMatches.filter(m => m.is_bye && m.couple1).sort((a, b) => Number(a.couple1?.couple_number) - Number(b.couple1?.couple_number))

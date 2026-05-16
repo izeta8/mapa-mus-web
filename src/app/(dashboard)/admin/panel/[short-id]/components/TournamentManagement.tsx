@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { TournamentFull } from "@/types/database";
 import { ParticipantList } from "./ParticipantList";
 import { AddParticipantForm } from "./AddParticipantForm";
+import { MatchManagement } from "./MatchManagement";
 
 interface Props {
   tournament: TournamentFull;
@@ -9,6 +10,8 @@ interface Props {
 
 export function TournamentManagement({ tournament }: Props) {
   const isPlanned = tournament.status === "planned";
+  const isOngoing = tournament.status === "ongoing";
+  const isFinished = tournament.status === "finished";
   
   // Ordenar parejas por número para que la lista sea predecible
   const sortedCouples = [...(tournament.couples || [])].sort((a, b) => a.couple_number - b.couple_number);
@@ -25,7 +28,9 @@ export function TournamentManagement({ tournament }: Props) {
         <CardDescription className="text-base">
           {isPlanned 
             ? "Gestiona los participantes antes de empezar el sorteo inicial." 
-            : "Controla los partidos y resultados de la ronda actual."}
+            : isOngoing 
+              ? "Controla los partidos y resultados de la ronda actual."
+              : "Torneo finalizado. Consulta los resultados."}
         </CardDescription>
       </CardHeader>
       
@@ -49,14 +54,7 @@ export function TournamentManagement({ tournament }: Props) {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center rounded-2xl bg-muted/20 border-2 border-dashed">
-            <div className="text-center p-12">
-              <h3 className="text-2xl font-bold mb-3">Rondas en curso</h3>
-              <p className="text-lg text-muted-foreground max-w-md mx-auto leading-relaxed">
-                El torneo ya ha comenzado. Aquí aparecerán los enfrentamientos y resultados.
-              </p>
-            </div>
-          </div>
+          <MatchManagement tournament={tournament} />
         )}
       </CardContent>
     </Card>

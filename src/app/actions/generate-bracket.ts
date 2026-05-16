@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { buildMatchesTree, coupleAsignation, nearestPowerOfTwo, shuffleAlgorithm } from "@/lib/utils";
 import { Couple, MatchInsert } from "@/types/database";
 import { revalidatePath } from "next/cache";
+import { updateTournamentStatus } from "./tournaments";
 
 export async function fetchTournamentCouples(tournamentId: string): Promise<Couple[]> {
 
@@ -54,22 +55,6 @@ export async function storeGeneratedBracket(tournamentId: string, bracket: Match
         console.error("Error en bulk insert:", insertError.message);
         throw new Error('No se ha podido insertar el cuadro');
     }
-}
-
-export async function updateTournamentStatus(tournamentId: string, status: 'ongoing') {
-    
-    const supabase = await createClient();
-    
-    const { error } = await supabase
-        .from('tournaments_develop')
-        .update({ status })
-        .eq('id', tournamentId);
-
-    if (error) {
-        console.error("Error al actualizar el estado del torneo:", error.message);
-        throw new Error('No se pudo cambiar el estado del torneo');
-    }
-    
 }
 
 export async function generateBracket(tournamentId: string) {
