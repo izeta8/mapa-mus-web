@@ -1,6 +1,5 @@
 
 import { getTournamentFullDataByShortId } from "@/services/tournaments";
-import TVTournamentPage from "./components/TVTournamentPage";
 import { notFound } from "next/navigation";
 
 interface Props {
@@ -19,10 +18,8 @@ export default async function Page({ params }: Props) {
   }
 
   return (
-      <TVTournamentPage 
-        tournamentName={tournamentData.name}
-        matches={tournamentData.matches}
-        inscribedCouples={tournamentData.total_couples}
-      />
+    <div>
+      Estas en el torneo {shortId}
+    </div>
   );
 }

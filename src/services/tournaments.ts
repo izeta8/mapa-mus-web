@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { TournamentFull } from "@/types/database";
+import { Tournament, TournamentFull } from "@/types/database";
 
-export async function getTournamentByShortId(shortId: string): Promise<TournamentFull | null> {
+export async function getTournamentFullDataByShortId(shortId: string): Promise<TournamentFull | null> {
   
     const supabase = await createClient();
 
@@ -38,3 +38,20 @@ export async function getTournamentByShortId(shortId: string): Promise<Tournamen
     };
 }
 
+
+export async function getOrganizerTournaments(organizerId: string): Promise<Tournament[] | null> {
+
+    const supabase = await createClient()
+
+    const { data: tournaments, error } = await supabase
+        .from('tournaments_develop')
+        .select("*")
+        .eq('organizer_id', organizerId)
+
+     if (error || !tournaments) {
+        console.error(error);
+        return null;
+    }
+
+    return tournaments
+}
