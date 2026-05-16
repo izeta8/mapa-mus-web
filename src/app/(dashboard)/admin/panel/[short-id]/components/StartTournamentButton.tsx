@@ -24,6 +24,7 @@ interface Props {
 
 export function StartTournamentButton({ tournamentId, couplesCount }: Props) {
   const [isPending, setIsPending] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleStart = async () => {
     if (couplesCount < 2) {
@@ -37,14 +38,15 @@ export function StartTournamentButton({ tournamentId, couplesCount }: Props) {
 
     if (result.success) {
       toast.success(result.message);
+      setOpen(false);
     } else {
       toast.error("Error al iniciar el torneo: " + result.error);
     }
   };
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger>
         <Button size="lg" className="h-12 px-8 text-base font-bold bg-primary text-primary-foreground" disabled={isPending}>
           <PlayIcon data-icon="inline-start" className="size-5" />
           {isPending ? "Iniciando..." : "Comenzar Torneo"}
