@@ -11,8 +11,18 @@ interface Props {
 
 export default function TVMatchupView({matches}: Props) {
   
-  const playingMatches = matches.filter(m => !m.is_bye);
-  const byes           = matches.filter(m =>  m.is_bye);
+  // The active round is the highest round (furthest from the final) that still has matches
+  // that are not completed (or the first round if everything is just starting).
+  const activeRound = Math.max(...matches.filter(m => m.status !== 'completed' || m.is_bye).map(m => m.round), 1);
+
+  // Filter matches to show ONLY those from the round that should be displayed on TV
+  const currentRoundMatches = matches.filter(m => m.round === activeRound);
+
+  // Matches being played (have two couples)
+  const playingMatches = currentRoundMatches.filter(m => !m.is_bye && m.couple1 && m.couple2);
+  
+  // Couples that advance directly in THIS ROUND (are byes at this level)
+  const byes = currentRoundMatches.filter(m => m.is_bye && m.couple1).sort((a, b) => Number(a.couple1?.couple_number) - Number(b.couple1?.couple_number))
 
   const [dimensions, setDimensions] = useState({ width: 1200, height: 800 });
   
