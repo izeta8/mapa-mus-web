@@ -6,7 +6,7 @@ import { buildMatchesTree, coupleAsignation, nearestPowerOfTwo, shuffleAlgorithm
 import { Couple, MatchInsert } from "@/types/database";
 import { revalidatePath } from "next/cache";
 
-export async function fetchTournamentCouples(tournamentId: number): Promise<Couple[]> {
+export async function fetchTournamentCouples(tournamentId: string): Promise<Couple[]> {
 
     const supabase = await createClient();
 
@@ -23,7 +23,7 @@ export async function fetchTournamentCouples(tournamentId: number): Promise<Coup
     return couples
 }
 
-export async function storeGeneratedBracket(tournamentId: number, bracket: MatchInsert[]) {
+export async function storeGeneratedBracket(tournamentId: string, bracket: MatchInsert[]) {
 
     /**
      * TODO: SECURITY CHECK (Pending Auth Implementation)
@@ -52,11 +52,27 @@ export async function storeGeneratedBracket(tournamentId: number, bracket: Match
 
     if (insertError) {
         console.error("Error en bulk insert:", insertError.message);
-        throw new Error('Error crítico al guardar el nuevo cuadro');
+        throw new Error('No se ha podido insertar el cuadro');
     }
 }
 
-export async function generateBracket(tournamentId: number) {
+export async function updateTournamentStatus(tournamentId: string, status: 'ongoing') {
+    
+    const supabase = await createClient();
+    
+    const { error } = await supabase
+        .from('tournaments_develop')
+        .update({ status })
+        .eq('id', tournamentId);
+
+    if (error) {
+        console.error("Error al actualizar el estado del torneo:", error.message);
+        throw new Error('No se pudo cambiar el estado del torneo');
+    }
+    
+}
+
+export async function generateBracket(tournamentId: string) {
 
     try {
 
@@ -76,10 +92,14 @@ export async function generateBracket(tournamentId: number) {
 
         // Erase a possible previous bracket and insert the new one
         await storeGeneratedBracket(tournamentId, finishedBracket);
-        revalidatePath(`/dashboard/tournaments/${tournamentId}`);
-        revalidatePath(`/dashboard/tv/${tournamentId}`);
+        
+        // Update tournament status to 'ongoing'
+        await updateTournamentStatus(tournamentId, 'ongoing');
 
-        return { success: true, message: "Cuadro generado con éxito" };
+        revalidatePath(`/admin/panel/[short-id]`, 'page');
+        revalidatePath(`/tv/${tournamentId}`);
+
+        return { success: true, message: "¡Torneo iniciado con éxito!" };
 
     } catch (error) {
         const message = error instanceof Error ? error.message : "Error inesperado";

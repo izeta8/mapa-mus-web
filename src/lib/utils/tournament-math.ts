@@ -26,7 +26,7 @@ export const shuffleAlgorithm = <T>(array: T[]): T[] => {
 
 }
 
-export const buildMatchesTree = (parentId: string | null, currentLevel: number, rowIndex: number, tournamentRounds: number, matchesArray: Partial<Match>[], tournament_id: number) => {
+export const buildMatchesTree = (parentId: string | null, currentLevel: number, rowIndex: number, tournamentRounds: number, matchesArray: Partial<Match>[], tournament_id: string) => {
     
     // Base case: If the maximun rounds are exceded we stop
     if (currentLevel > tournamentRounds) return;

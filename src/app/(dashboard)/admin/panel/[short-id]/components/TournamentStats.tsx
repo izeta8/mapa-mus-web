@@ -9,6 +9,9 @@ interface Props {
 }
 
 export function TournamentStats({ tournament, shortId }: Props) {
+
+  const actualCouplesCount = tournament.couples?.length || 0;
+
   return (
     <div className="flex flex-col gap-8">
       <Card className="shadow-sm">
@@ -19,9 +22,9 @@ export function TournamentStats({ tournament, shortId }: Props) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-4xl font-black">{tournament.total_couples}</div>
+          <div className="text-4xl font-black">{actualCouplesCount}</div>
           <p className="text-sm text-muted-foreground mt-2">
-            Parejas inscritas actualmente
+            Parejas inscritas
           </p>
         </CardContent>
       </Card>

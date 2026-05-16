@@ -1,8 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TvIcon, SettingsIcon, PlayIcon, MapPinIcon, CalendarIcon } from "lucide-react";
+import { TvIcon, SettingsIcon, MapPinIcon, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { TournamentFull } from "@/types/database";
+import { StartTournamentButton } from "./StartTournamentButton";
 
 interface Props {
   tournament: TournamentFull;
@@ -11,6 +12,7 @@ interface Props {
 
 export function TournamentHeader({ tournament, shortId }: Props) {
   const isPlanned = tournament.status === "planned";
+  const isOngoing = tournament.status === "ongoing";
   const isFinished = tournament.status === "finished";
 
   return (
@@ -19,10 +21,11 @@ export function TournamentHeader({ tournament, shortId }: Props) {
         <div className="flex items-center gap-4 mb-2">
           <h1 className="text-4xl font-extrabold tracking-tight leading-tight">{tournament.name}</h1>
           <Badge 
-            variant={isPlanned ? "outline" : isFinished ? "secondary" : "default"}
+            variant={isPlanned ? "outline" : isOngoing ? "default" : isFinished ? "secondary" : "secondary"}
             className="capitalize px-3 py-1 text-sm font-semibold"
           >
             {tournament.status === "planned" ? "Planeado / Inscripción" : 
+             tournament.status === "ongoing" ? "En Juego (Live)" : 
              tournament.status === "finished" ? "Finalizado" : 
              tournament.status === "revision_pending" ? "En Revisión" : "Cancelado"}
           </Badge>
@@ -44,21 +47,21 @@ export function TournamentHeader({ tournament, shortId }: Props) {
       </div>
 
       <div className="flex items-center gap-4">
-        <Button variant="outline" size="lg" className="h-12 px-6 text-base">
-          <Link href={`/tv/${shortId}`} target="_blank">
+        <Link href={`/tv/${shortId}`} target="_blank">
+          <Button variant="outline" size="lg" className="h-12 px-6 text-base cursor-pointer">
             <TvIcon data-icon="inline-start" className="size-5" />
             Modo TV
-          </Link>
-        </Button>
+          </Button>
+        </Link>
         <Button variant="outline" size="lg" className="h-12 px-6 text-base">
           <SettingsIcon data-icon="inline-start" className="size-5" />
           Configurar
         </Button>
         {isPlanned && (
-          <Button size="lg" className="h-12 px-8 text-base font-bold bg-primary text-primary-foreground">
-            <PlayIcon data-icon="inline-start" className="size-5" />
-            Comenzar Torneo
-          </Button>
+          <StartTournamentButton 
+            tournamentId={tournament.id} 
+            couplesCount={tournament.couples.length} 
+          />
         )}
       </div>
     </div>
