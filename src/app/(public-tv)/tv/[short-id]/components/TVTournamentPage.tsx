@@ -15,7 +15,8 @@ interface Props {
 export default function TVTournamentPage({ tournamentName, matches, inscribedCouples }: Props) {
 
   const shouldShowMatchupView = matches.length >= 32;
-  const [viewMode, setViewMode] = useState<ViewMode>(shouldShowMatchupView ? "matchup" : "bracket");
+  const [viewMode, setViewMode] = useState<ViewMode>("matchup");
+  // const [viewMode, setViewMode] = useState<ViewMode>(shouldShowMatchupView ? "matchup" : "bracket");
   const isBracketCreated = matches && matches.length > 0;
   
   return (
