@@ -10,6 +10,7 @@ export type TournamentStatus = Database['public']['Enums']['tournament_status'];
 export type MatchInsert = Database['public']['Tables']['matches']['Insert']
 
 export interface CoupleInfo {
+  id: string;
   player1_name: string | null;
   player2_name: string | null;
   couple_number: number;

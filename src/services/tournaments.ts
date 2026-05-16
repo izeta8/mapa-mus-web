@@ -25,10 +25,7 @@ export async function getTournamentFullDataByShortId(shortId: string): Promise<T
             )
         ),
         couples (
-            id,
-            player1_name,
-            player2_name,
-            couple_number
+            *
         )
         `)
         .eq('short_id', shortId)
