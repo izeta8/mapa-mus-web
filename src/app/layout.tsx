@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Mapa Mus",
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="es" className={`${GeistSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
+        <Toaster position="top-center" richColors theme="light" />
       </body>
     </html>
   );
