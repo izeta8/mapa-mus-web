@@ -62,6 +62,7 @@ La organización es estricta para evitar la dispersión de lógica:
 4. **Server Actions**: Deben devolver `{ success: boolean, message?: string, error?: string }` y usar `revalidatePath` tras mutaciones.
 5. **Naming**: `camelCase` (funciones/variables), `PascalCase` (Componentes/Tipos), `kebab-case` (archivos/carpetas).
 6. **UX B2B/TV**: Botones grandes, alto contraste. Modo TV: tipografías dinámicas calculadas en `helpers.ts`. **Prohibido scroll vertical en TV**.
+7. **Idioma (English Only)**: Todo el código (variables, funciones, componentes, nombres de archivos, etc.) y los comentarios deben estar escritos estrictamente en **inglés**.
 
 ---
 
