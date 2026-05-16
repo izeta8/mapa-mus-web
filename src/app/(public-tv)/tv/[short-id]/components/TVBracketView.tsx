@@ -1,9 +1,9 @@
 "use client"
 
-import { Match } from "@/types";
+import { MatchWithCouples } from "@/types";
 
 interface Props {
-  matches: Match[]
+  matches: MatchWithCouples[]
 }
 
 export default function TVBracketView({matches}: Props) {
