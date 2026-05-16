@@ -26,11 +26,6 @@ export function MatchManagement({ tournament }: Props) {
   const [activeTab, setActiveTab] = useState(tournamentCurrentRound.toString());
   const [isAdvancing, setIsAdvancing] = useState(false);
 
-  // Sincronizar la pestaña si el torneo cambia externamente (ej: otro admin avanza ronda)
-  useEffect(() => {
-    setActiveTab(tournamentCurrentRound.toString());
-  }, [tournamentCurrentRound]);
-
   // Verificar si la ronda que estamos mirando está completa
   const currentTabMatches = tournament.matches.filter(m => m.round === parseInt(activeTab));
   const isRoundComplete = currentTabMatches.length > 0 && currentTabMatches.every(m => m.status === 'completed' || m.is_bye);

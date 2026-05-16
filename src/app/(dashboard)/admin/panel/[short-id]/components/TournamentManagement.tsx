@@ -54,7 +54,10 @@ export function TournamentManagement({ tournament }: Props) {
             </div>
           </div>
         ) : (
-          <MatchManagement tournament={tournament} />
+          <MatchManagement 
+            key={tournament.current_round} 
+            tournament={tournament} 
+          />
         )}
       </CardContent>
     </Card>
