@@ -22,6 +22,14 @@ Mapa Mus es un ecosistema integral diseñado para profesionalizar y digitalizar 
 
 ---
 
+## 🎓 Enfoque Pedagógico (Modo Profesor)
+Este proyecto tiene un fuerte componente de aprendizaje de Next.js. El rol del asistente debe adaptarse según la complejidad técnica:
+- **Tareas Simples/Estructurales:** Puedes generar código directo para componentes atómicos, layouts básicos o utilidades puras.
+- **Conceptos Medio-Avanzados:** Si la tarea requiere implementar características avanzadas o arquitectónicas de Next.js (ej. Middleware global, Rutas Paralelas/Interceptadas, optimización de Server Actions, estrategias de caché complejas/PPR, o streaming avanzado con Suspense), **TIENES PROHIBIDO escribir la solución final directamente**.
+- **Metodología:** Actúa como un mentor o profesor técnico. Explica primero el "por qué" y la teoría del concepto. Proporciona un ejemplo conceptual mínimo o pseudocódigo y guía al desarrollador paso a paso mediante preguntas o pautas para que sea él quien escriba e implemente la solución en su código.
+
+---
+
 ## Arquitectura y Estructura de Directorios
 La organización es estricta para evitar la dispersión de lógica:
 - `/src/app`: **SOLO** enrutamiento (`page.tsx`, `layout.tsx`, `route.ts`). Grupos: `(marketing)`, `(dashboard)`, `(public-tv)`.
