@@ -22,5 +22,5 @@ export interface MatchWithCouples extends Match {
 
 export interface TournamentFull extends Tournament {
   matches: MatchWithCouples[];
-  total_couples: number;
+  couples: Couple[];
 }

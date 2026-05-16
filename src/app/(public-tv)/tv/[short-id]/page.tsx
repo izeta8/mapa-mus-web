@@ -22,7 +22,7 @@ export default async function Page({ params }: Props) {
       <TVTournamentPage 
         tournamentName={tournamentData.name}
         matches={tournamentData.matches}
-        inscribedCouples={tournamentData.total_couples}
+        inscribedCouples={tournamentData.couples.length}
       />
   );
 }

@@ -12,17 +12,24 @@ export async function getTournamentFullDataByShortId(shortId: string): Promise<T
         matches (
             *,
             couple1:couples!couple1_id (
-            player1_name,
-            player2_name,
-            couple_number
+                id,
+                player1_name,
+                player2_name,
+                couple_number
             ),
             couple2:couples!couple2_id (
+                id,
+                player1_name,
+                player2_name,
+                couple_number
+            )
+        ),
+        couples (
+            id,
             player1_name,
             player2_name,
             couple_number
-            )
-        ),
-        stats:couples(count)
+        )
         `)
         .eq('short_id', shortId)
         .maybeSingle();
@@ -32,10 +39,7 @@ export async function getTournamentFullDataByShortId(shortId: string): Promise<T
         return null;
     }
 
-    return {
-        ...data,
-        total_couples: data.stats?.[0]?.count ?? 0,
-    };
+    return data;
 }
 
 

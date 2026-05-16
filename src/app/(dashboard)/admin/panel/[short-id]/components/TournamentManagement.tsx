@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { UsersIcon } from "lucide-react";
 import { TournamentFull } from "@/types/database";
+import { ParticipantList } from "./ParticipantList";
+import { AddParticipantForm } from "./AddParticipantForm";
 
 interface Props {
   tournament: TournamentFull;
@@ -9,9 +9,17 @@ interface Props {
 
 export function TournamentManagement({ tournament }: Props) {
   const isPlanned = tournament.status === "planned";
+  
+  // Ordenar parejas por número para que la lista sea predecible
+  const sortedCouples = [...(tournament.couples || [])].sort((a, b) => a.couple_number - b.couple_number);
+  
+  // Calcular el siguiente número de pareja
+  const nextCoupleNumber = sortedCouples.length > 0 
+    ? Math.max(...sortedCouples.map(c => c.couple_number)) + 1 
+    : 1;
 
   return (
-    <Card className="h-full min-h-[500px] shadow-sm flex flex-col border-2">
+    <Card className="h-full min-h-150 shadow-sm flex flex-col border-2">
       <CardHeader className="p-8 pb-4">
         <CardTitle className="text-2xl font-bold">Gestión del Torneo</CardTitle>
         <CardDescription className="text-base">
@@ -20,19 +28,36 @@ export function TournamentManagement({ tournament }: Props) {
             : "Controla los partidos y resultados de la ronda actual."}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 flex items-center justify-center m-8 mt-4 rounded-2xl bg-muted/20 border-2 border-dashed">
-        <div className="text-center p-12">
-          <div className="size-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-            <UsersIcon className="size-10 text-muted-foreground" />
+      
+      <CardContent className="p-8 pt-4 flex-1 flex flex-col">
+        {isPlanned ? (
+          <div className="flex flex-col h-full">
+            <AddParticipantForm 
+              tournamentId={tournament.id} 
+              nextCoupleNumber={nextCoupleNumber} 
+            />
+            
+            <div className="flex-1">
+              <h3 className="text-xl font-bold mb-6 flex items-center justify-between">
+                Participantes Inscritos
+                <span className="text-sm font-normal text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                  Total: {sortedCouples.length}
+                </span>
+              </h3>
+              
+              <ParticipantList couples={sortedCouples} />
+            </div>
           </div>
-          <h3 className="text-2xl font-bold mb-3">Próximo paso: Lista de Participantes</h3>
-          <p className="text-lg text-muted-foreground max-w-md mx-auto mb-8 leading-relaxed">
-            Aquí aparecerán las parejas inscritas. Podrás añadir nuevas o eliminarlas antes de generar el sorteo inicial.
-          </p>
-          <Button variant="secondary" size="lg" className="px-8 h-12 font-semibold">
-            Ver documentación de ayuda
-          </Button>
-        </div>
+        ) : (
+          <div className="flex-1 flex items-center justify-center rounded-2xl bg-muted/20 border-2 border-dashed">
+            <div className="text-center p-12">
+              <h3 className="text-2xl font-bold mb-3">Rondas en curso</h3>
+              <p className="text-lg text-muted-foreground max-w-md mx-auto leading-relaxed">
+                El torneo ya ha comenzado. Aquí aparecerán los enfrentamientos y resultados.
+              </p>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
