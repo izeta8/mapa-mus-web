@@ -65,6 +65,17 @@ La organización es estricta para evitar la dispersión de lógica:
 
 ---
 
+# Verificación de Errores y Calidad (Pre-entrega)
+Antes de dar por finalizada cualquier respuesta o implementación de código:
+
+- Comando de Validación: Se debe verificar que el código pase el comando next lint.
+
+- Autocorrección: Si se identifica cualquier error de linting, fallo en tipos de TypeScript (uso accidental de any) o infracción de las convenciones de Next.js, se debe corregir inmediatamente.
+
+- Enfoque en la Feature: Asegurar específicamente que los fallos relacionados con la nueva funcionalidad implementada queden resueltos, garantizando que el código entregado sea limpio y funcional.
+
+---
+
 ## Base de Datos (Supabase)
 - **Acceso al Esquema:** Verifica siempre la estructura real con el servidor MCP o herramientas de inspección antes de escribir consultas.
 - **Políticas RLS:** Ten en cuenta que todas las tablas tienen RLS activo.
