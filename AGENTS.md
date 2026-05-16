@@ -79,7 +79,10 @@ Antes de dar por finalizada cualquier respuesta o implementación de código:
 ## Base de Datos (Supabase)
 - **Acceso al Esquema:** Verifica siempre la estructura real con el servidor MCP o herramientas de inspección antes de escribir consultas.
 - **Políticas RLS:** Ten en cuenta que todas las tablas tienen RLS activo.
-- **Tipado:** Usa exclusivamente los tipos de `@/types/supabase` para mantener sincronía con la base de datos.
+- **Tipado:** 
+    - **PROHIBIDO** editar manualmente `src/types/supabase.ts`. 
+    - Para actualizar los tipos, usa el comando `supabase gen types typescript` junto con el `SUPABASE_ACCESS_TOKEN` definido en el archivo `.env`. Esto asegura sincronía total con la base de datos.
+    - Usa exclusivamente los tipos de `@/types/supabase` para construir la lógica en `@/types/database.ts`.
 
 ---
 
