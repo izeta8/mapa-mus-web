@@ -39,7 +39,8 @@ export const buildMatchesTree = (parentId: string | null, currentLevel: number, 
         round: currentLevel,
         row_index: rowIndex,
         status: 'pending',
-        tournament_id: tournament_id
+        tournament_id: tournament_id,
+        is_bye: false
     };
 
     matchesArray.push(match);
@@ -83,6 +84,7 @@ export const coupleAsignation = (matchesToInsert: MatchInsert[], tournamentRound
 
             // Set the table where the match is going to play
             match.table_number = (index + 1).toString()
+            match.is_bye = false
 
         } else {
             
@@ -109,6 +111,8 @@ export const coupleAsignation = (matchesToInsert: MatchInsert[], tournamentRound
         }
 
     });
+
+    console.log(lastRoundMatches)
 
     return matchesToInsert;
 }
