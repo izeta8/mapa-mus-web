@@ -17,12 +17,13 @@ export default function TVTournamentPage({ tournamentName, matches, inscribedCou
   const shouldShowMatchupView = matches.length >= 32;
   const [viewMode, setViewMode] = useState<ViewMode>(shouldShowMatchupView ? "matchup" : "bracket");
   const isBracketCreated = matches && matches.length > 0;
-
+  
   return (
     <div className="h-screen bg-zinc-50 text-black p-4 flex flex-col ">
 
       <TVHeader 
         tournamentName={tournamentName} 
+        viewMode={viewMode}
         setViewMode={setViewMode} 
         inscribedCouples={inscribedCouples}
         isBracketCreated={isBracketCreated}

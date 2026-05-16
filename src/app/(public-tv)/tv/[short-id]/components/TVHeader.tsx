@@ -4,17 +4,19 @@ import { Network, StretchHorizontal } from "lucide-react";
 
 interface TVHeaderProps {
   tournamentName: string;
+  viewMode: ViewMode;
   setViewMode: (viewMode: ViewMode) => void;
   inscribedCouples: number;
   isBracketCreated: boolean;
 }
 
 interface TVModeSelectorProps {
+  viewMode: ViewMode;
   setViewMode: (viewMode: ViewMode) => void;
 }
 
 
-export default function TVHeader({tournamentName, setViewMode, inscribedCouples, isBracketCreated}: TVHeaderProps) {
+export default function TVHeader({tournamentName, viewMode, setViewMode, inscribedCouples, isBracketCreated}: TVHeaderProps) {
 
   return (
     <header className="flex justify-between items-center shrink-0 mb-4">
@@ -29,7 +31,7 @@ export default function TVHeader({tournamentName, setViewMode, inscribedCouples,
         </div>
      
         {isBracketCreated && (
-          <TVModeSelector setViewMode={setViewMode} />
+          <TVModeSelector viewMode={viewMode} setViewMode={setViewMode} />
         )}
 
       </header>
@@ -37,10 +39,10 @@ export default function TVHeader({tournamentName, setViewMode, inscribedCouples,
 
 }
 
-function TVModeSelector({ setViewMode }: TVModeSelectorProps) {
+function TVModeSelector({ viewMode, setViewMode }: TVModeSelectorProps) {
 
   return (
-    <Tabs defaultValue="matchup">
+    <Tabs defaultValue={viewMode}>
       <TabsList>
 
         {/* PAREJAS */}
