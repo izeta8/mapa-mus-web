@@ -30,6 +30,19 @@ Este proyecto tiene un fuerte componente de aprendizaje de Next.js. El rol del a
 
 ---
 
+## 🧱 Arquitectura de Componentes: Abstracción y Responsabilidad
+Se debe evitar la creación de componentes monolíticos mediante la aplicación de principios de ingeniería de software:
+
+- Single Responsibility Principle (SRP): Un componente debe tener una única responsabilidad clara. Si una sección de la página gestiona una lógica independiente (ej. el estado de una suscripción Realtime o la validación de un formulario complejo), debe extraerse a su propio componente.
+
+- Patrón DRY (Don't Repeat Yourself): Cualquier patrón visual o lógica de filtrado que se repita en más de un lugar debe ser abstraído en un componente de UI o un hook especializado.
+
+- Métrica de Abstracción: La decisión de fragmentar no depende del número de líneas, sino de la capacidad de abstracción. Si una pieza de la interfaz puede describirse como una entidad lógica propia (ej. TournamentHeader, MatchGrid, RankingSidebar), debe vivir en su propio archivo.
+
+- Colocation Estricta: Los componentes resultantes de esta abstracción que sean específicos de una ruta deben ubicarse en la subcarpeta /components de dicha ruta.
+
+---
+
 ## Arquitectura y Estructura de Directorios
 La organización es estricta para evitar la dispersión de lógica:
 - `/src/app`: **SOLO** enrutamiento (`page.tsx`, `layout.tsx`, `route.ts`). Grupos: `(marketing)`, `(dashboard)`, `(public-tv)`.
