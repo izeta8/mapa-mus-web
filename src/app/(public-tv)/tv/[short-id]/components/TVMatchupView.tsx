@@ -42,7 +42,7 @@ export default function TVMatchupView({matches}: Props) {
     <div className="h-full w-full flex flex-col" style={{ display: "grid", gridTemplateRows: "65% 35%", gridTemplateColumns: "1fr", gap: "8px", padding: "8px" }}>
       
       {/* PLAYING COUPLES - 70% */}
-      <div className="flex flex-wrap gap-3 justify-evenly">
+      <div className="flex flex-wrap gap-3 justify-evenly items-center content-center h-full">
         {playingMatches.map((match) => (
           <MatchupCard 
             key={match.id}
@@ -103,7 +103,7 @@ export const MatchupCard = ({match, playingMatchStyles}: MatchupCardProps) => {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center border-2 border-black bg-white shadow-md ${playingMatchStyles.container}`}
+      className={`flex flex-col items-center justify-center border-2 border-black bg-white shadow-md py-5 ${playingMatchStyles.container}`}
     >
       <div className={`font-bold text-zinc-400 mb-1 ${playingMatchStyles.mesa}`}>MESA {match.table_number}</div>
       <div className="flex items-center gap-3">
