@@ -101,15 +101,31 @@ export const MatchupCard = ({match, playingMatchStyles}: MatchupCardProps) => {
     return
   }
 
+  const hasWinner = !!match.winner_id;
+  const isWinner1 = match.winner_id === match.couple1_id;
+  const isWinner2 = match.winner_id === match.couple2_id;
+
+  const winnerColor = "#b6f3bb";
+  const loserColor  = "#fecaca"; 
+
+  const splitBackground = hasWinner ? {
+    background: `linear-gradient(to right, ${isWinner1 ? winnerColor : loserColor} 50%, ${isWinner2 ? winnerColor : loserColor} 50%)`
+  } : {};
+
   return (
     <div
-      className={`flex flex-col items-center justify-center border-2 border-black bg-white shadow-md py-5 ${playingMatchStyles.container}`}
+      className={`flex flex-col items-center justify-center border-2 border-black bg-white shadow-md aspect-3/2 transition-all duration-500 ${playingMatchStyles.container}`}
+      style={splitBackground}
     >
-      <div className={`font-bold text-zinc-400 mb-1 ${playingMatchStyles.mesa}`}>MESA {match.table_number}</div>
-      <div className="flex items-center gap-3">
-        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero}`}>{match.couple1?.couple_number}</span>
-        <span className={`font-bold text-zinc-300 ${playingMatchStyles.vs}`}>vs</span>
-        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero}`}>{match.couple2?.couple_number}</span>
+      <div className={`font-bold ${hasWinner ? 'text-zinc-700' : 'text-zinc-400'} mb-1 ${playingMatchStyles.mesa}`}>MESA {match.table_number}</div>
+      <div className="grid grid-cols-3 text-center items-center gap-3">
+        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero} transition-transform`}>
+          {match.couple1?.couple_number}
+        </span>
+        <span className={`font-bold  ${playingMatchStyles.vs} ${hasWinner ? 'text-zinc-600' : 'text-zinc-300'} `}>vs</span>
+        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero} transition-transform`}>
+          {match.couple2?.couple_number}
+        </span>
       </div>
     </div>
   )
