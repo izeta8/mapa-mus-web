@@ -1,6 +1,6 @@
 "use client"
 
-import { Match, ViewMode } from "@/types/database";
+import { MatchWithCouples, ViewMode } from "@/types/database";
 import TVBracketView from "./TVBracketView";
 import TVHeader from "./TVHeader";
 import TVMatchupView from "./TVMatchupView";
@@ -8,7 +8,7 @@ import { useState } from "react";
 
 interface Props {
   tournamentName: string,
-  matches: Match[],
+  matches: MatchWithCouples[],
   inscribedCouples: number
 }
 

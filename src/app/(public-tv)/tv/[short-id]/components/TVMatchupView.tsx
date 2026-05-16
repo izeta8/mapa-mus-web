@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { getFontSize } from "../helpers";
-import { Match } from "@/types/database";
+import { MatchWithCouples } from "@/types/database";
 import { MatchupCardStyles } from "@/types";
 
 interface Props {
-  matches: Match[],
+  matches: MatchWithCouples[],
 }
 
 export default function TVMatchupView({matches}: Props) {
@@ -58,7 +58,7 @@ export default function TVMatchupView({matches}: Props) {
                   key={bye.id}
                   className={`border border-zinc-400 bg-white text-center ${byeMatchStyles.container}`}
                 >
-                  <span className={`font-black text-zinc-800 text-xl ${byeMatchStyles.numero}`}>{bye.couple1_id}</span>
+                  <span className={`font-black text-zinc-800 text-xl ${byeMatchStyles.numero}`}>{bye.couple1?.couple_number}</span>
                 </div>
               ))}
             </div>
@@ -81,11 +81,15 @@ export default function TVMatchupView({matches}: Props) {
 }
 
 interface MatchupCardProps {
-  match: Match,
+  match: MatchWithCouples,
   playingMatchStyles: MatchupCardStyles
 }
 
 export const MatchupCard = ({match, playingMatchStyles}: MatchupCardProps) => {
+
+  if (match.couple1 === null && match.couple2 === null) {
+    return
+  }
 
   return (
     <div
@@ -93,9 +97,9 @@ export const MatchupCard = ({match, playingMatchStyles}: MatchupCardProps) => {
     >
       <div className={`font-bold text-zinc-400 mb-1 ${playingMatchStyles.mesa}`}>MESA {match.table_number}</div>
       <div className="flex items-center gap-3">
-        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero}`}>{match.couple1_id}</span>
+        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero}`}>{match.couple1?.couple_number}</span>
         <span className={`font-bold text-zinc-300 ${playingMatchStyles.vs}`}>vs</span>
-        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero}`}>{match.couple2_id}</span>
+        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero}`}>{match.couple2?.couple_number}</span>
       </div>
     </div>
   )
