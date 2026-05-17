@@ -43,6 +43,17 @@ Se debe evitar la creación de componentes monolíticos mediante la aplicación 
 
 ---
 
+## Reglas de Componentes (UI)
+- **Base UI (Nova Style):** El proyecto utiliza la versión "Nova" de shadcn/ui, basada en `@base-ui/react`.
+- **PROHIBIDO el uso de `asChild`:** Esta propiedad es exclusiva de Radix UI y no existe en Base UI. Su uso causa errores de hidratación y anidamiento ilegal de etiquetas (ej: `<button>` dentro de `<button>`).
+- **Uso de `render`:** Para delegar el renderizado a un componente hijo (patrón Slot), se debe utilizar la propiedad `render`.
+    - **Incorrecto:** `<Trigger asChild><Button>...</Button></Trigger>`
+    - **Correcto:** `<Trigger render={<Button>...</Button>} />`
+- Composición de Botones y Enlaces:** Evita envolver botones dentro de otros botones. Si necesitas un botón que actúe como un enlace de Next.js, envuelve el botón con el componente `<Link>` directamente.
+- **Fechas y Localización:** Para evitar errores de `Hydration Mismatch` causados por discrepancias entre el servidor y el cliente (formateo local), se debe utilizar **SIEMPRE** el componente `<SafeDate />` situado en `@/components/ui/safe-date`.
+
+---
+
 ## Arquitectura y Estructura de Directorios
 La organización es estricta para evitar la dispersión de lógica:
 - `/src/app`: **SOLO** enrutamiento (`page.tsx`, `layout.tsx`, `route.ts`). Grupos: `(marketing)`, `(dashboard)`, `(public-tv)`.
