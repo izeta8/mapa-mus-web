@@ -22,15 +22,9 @@ export default async function Page({ params }: Props) {
     <div className="container mx-auto p-8 max-w-screen-2xl">
       <TournamentHeader tournament={tournament} shortId={shortId} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-1">
-          <TournamentStats tournament={tournament} shortId={shortId} />
-        </div>
-
-        <div className="lg:col-span-3">
-          <TournamentManagement tournament={tournament} />
-        </div>
-      </div>
+      <TournamentStats tournament={tournament} shortId={shortId} />
+      
+      <TournamentManagement tournament={tournament} />
     </div>
   );
 }

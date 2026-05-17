@@ -28,11 +28,10 @@ export function MatchManagement({ tournament }: Props) {
 
   // Verificar si la ronda que estamos mirando está completa
   const currentTabMatches = tournament.matches.filter(m => m.round === parseInt(activeTab));
-  const isRoundComplete = currentTabMatches.length > 0 && currentTabMatches.every(m => m.status === 'completed' || m.is_bye);
-  
-  // Verificar si es la ronda que está actualmente "en la TV"
-  const isViewingCurrentTournamentRound = parseInt(activeTab) === tournamentCurrentRound;
+  const isRoundComplete = currentTabMatches.length > 0 && currentTabMatches.every(m => m.winner_id !== null || m.is_bye);
 
+  // Verificar si es la ronda que está actualmente "en la TV"  const isViewingCurrentTournamentRound = parseInt(activeTab) === tournamentCurrentRound;
+  const isViewingCurrentTournamentRound = parseInt(activeTab) === tournamentCurrentRound;
   const handleAdvanceRound = async () => {
     const nextRound = tournamentCurrentRound - 1;
     if (nextRound < 1) {
@@ -109,7 +108,7 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
   const [isSettingWinner, setIsSettingWinner] = useState<string | null>(null);
   const [isRollingBack, setIsRollingBack] = useState(false);
 
-  const isCompleted = match.status === 'completed';
+  const isCompleted = match.winner_id !== null;
   const isBye = match.is_bye;
 
   const handleSetWinner = async (coupleId: string) => {

@@ -11,7 +11,6 @@ interface Props {
 export function TournamentManagement({ tournament }: Props) {
   const isPlanned = tournament.status === "planned";
   const isOngoing = tournament.status === "ongoing";
-  const isFinished = tournament.status === "finished";
   
   // Ordenar parejas por número para que la lista sea predecible
   const sortedCouples = [...(tournament.couples || [])].sort((a, b) => a.couple_number - b.couple_number);

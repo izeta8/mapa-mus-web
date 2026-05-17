@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TvIcon, SettingsIcon, MapPinIcon, CalendarIcon } from "lucide-react";
+import { TvIcon, MapPinIcon, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { TournamentFull } from "@/types/database";
 import { StartTournamentButton } from "./StartTournamentButton";
@@ -54,10 +54,6 @@ export function TournamentHeader({ tournament, shortId }: Props) {
             Modo TV
           </Button>
         </Link>
-        <Button variant="outline" size="lg" className="h-12 px-6 text-base">
-          <SettingsIcon data-icon="inline-start" className="size-5" />
-          Configurar
-        </Button>
         {isPlanned && (
           <StartTournamentButton 
             tournamentId={tournament.id} 

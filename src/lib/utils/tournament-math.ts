@@ -38,7 +38,6 @@ export const buildMatchesTree = (parentId: string | null, currentLevel: number, 
         next_match_id: parentId,
         round: currentLevel,
         row_index: rowIndex,
-        status: 'pending',
         tournament_id: tournament_id,
         is_bye: false
     };
@@ -93,7 +92,6 @@ export const coupleAsignation = (matchesToInsert: MatchInsert[], tournamentRound
 
             if (byeCouple) {
                 match.is_bye = true
-                match.status = 'completed'
                 match.couple1_id = byeCouple.id
                 match.couple2_id = null // I prefer to put couple_id as null to see better in logs that is a bye match.
                 match.winner_id = byeCouple.id
