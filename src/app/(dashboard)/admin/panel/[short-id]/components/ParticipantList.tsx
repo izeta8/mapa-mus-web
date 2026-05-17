@@ -81,16 +81,18 @@ export function ParticipantList({ couples }: { couples: any[] }) {
               </TableCell>
               <TableCell className="text-right pr-6">
                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-destructive hover:bg-destructive/10 size-10" 
-                      disabled={isDeleting === couple.id}
-                    >
-                      <Trash2Icon className="size-5" />
-                    </Button>
-                  </AlertDialogTrigger>
+                  <AlertDialogTrigger 
+                    render={
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-destructive hover:bg-destructive/10 size-10" 
+                        disabled={isDeleting === couple.id}
+                      >
+                        <Trash2Icon className="size-5" />
+                      </Button>
+                    }
+                  />
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>¿Eliminar pareja?</AlertDialogTitle>

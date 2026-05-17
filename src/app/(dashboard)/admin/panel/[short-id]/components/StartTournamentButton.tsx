@@ -46,12 +46,14 @@ export function StartTournamentButton({ tournamentId, couplesCount }: Props) {
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger>
-        <Button size="lg" className="h-12 px-8 text-base font-bold bg-primary text-primary-foreground" disabled={isPending}>
-          <PlayIcon data-icon="inline-start" className="size-5" />
-          {isPending ? "Iniciando..." : "Comenzar Torneo"}
-        </Button>
-      </AlertDialogTrigger>
+      <AlertDialogTrigger 
+        render={
+          <Button size="lg" className="h-12 px-8 text-base font-bold bg-primary text-primary-foreground" disabled={isPending}>
+            <PlayIcon data-icon="inline-start" className="size-5" />
+            {isPending ? "Iniciando..." : "Comenzar Torneo"}
+          </Button>
+        }
+      />
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>¿Comenzar el torneo ahora?</AlertDialogTitle>

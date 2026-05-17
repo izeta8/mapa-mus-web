@@ -4,6 +4,7 @@ import { TvIcon, SettingsIcon, MapPinIcon, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { TournamentFull } from "@/types/database";
 import { StartTournamentButton } from "./StartTournamentButton";
+import { SafeDate } from "@/components/ui/safe-date";
 
 interface Props {
   tournament: TournamentFull;
@@ -39,7 +40,7 @@ export function TournamentHeader({ tournament, shortId }: Props) {
             <CalendarIcon className="size-5" />
             <span className="text-lg">
               {tournament.tournament_date 
-                ? new Date(tournament.tournament_date).toLocaleDateString() 
+                ? <SafeDate date={tournament.tournament_date} />
                 : "Fecha no definida"}
             </span>
           </div>

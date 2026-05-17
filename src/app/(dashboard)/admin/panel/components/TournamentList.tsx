@@ -1,6 +1,7 @@
 import { getOrganizerTournaments } from "@/services/tournaments";
 import { Calendar, Coins, Crown, MapPin, Users } from "lucide-react";
 import Link from "next/link";
+import { SafeDate } from "@/components/ui/safe-date";
 
 export async function TournamentList({ organizerId }: { organizerId: string }) {
   const tournaments = await getOrganizerTournaments(organizerId);
@@ -34,11 +35,8 @@ export async function TournamentList({ organizerId }: { organizerId: string }) {
             <div className="grow space-y-2.5 mb-6">
               <div className="flex items-center text-sm text-zinc-600">
                 <Calendar className="w-4 h-4 mr-2.5 text-zinc-400 shrink-0" />
-                {new Date(tournament.tournament_date).toLocaleDateString("es-ES", { 
-                  weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' 
-                })}
-              </div>
-              
+                <SafeDate date={tournament.tournament_date} />
+              </div>              
               <div className="flex items-center text-sm text-zinc-600">
                 <MapPin className="w-4 h-4 mr-2.5 text-zinc-400 shrink-0" />
                 <span className="truncate">{tournament.location}</span>
