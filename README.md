@@ -2,6 +2,8 @@
 ```bash
 $env:SUPABASE_ACCESS_TOKEN="el token"
 npx supabase gen types typescript --project-id "yqjtuultqqedksqrkejl" > "src\types\supabase.ts"
+o 
+npx supabase@latest gen types typescript --project-id "yqjtuultqqedksqrkejl" > src/types/supabase.ts
 ```
 
 
