@@ -102,7 +102,7 @@ export async function updateTournamentStatus(tournamentId: string, status: 'ongo
     const supabase = await createClient();
     
     const { error } = await supabase
-        .from('tournaments_develop')
+        .from('tournaments')
         .update({ status })
         .eq('id', tournamentId)
         
@@ -117,7 +117,7 @@ export async function advanceTournamentRound(tournamentId: string, round: number
   const supabase = await createClient();
 
   const { error } = await supabase
-    .from('tournaments_develop')
+    .from('tournaments')
     .update({ current_round: round })
     .eq('id', tournamentId);
 

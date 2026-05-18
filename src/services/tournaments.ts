@@ -6,7 +6,7 @@ export async function getTournamentFullDataByShortId(shortId: string): Promise<T
     const supabase = await createClient();
 
     const { data, error } = await supabase
-        .from('tournaments_develop')
+        .from('tournaments')
         .select(`
         *,
         matches (
@@ -45,7 +45,7 @@ export async function getOrganizerTournaments(organizerId: string): Promise<Tour
     const supabase = await createClient()
 
     const { data: tournaments, error } = await supabase
-        .from('tournaments_develop')
+        .from('tournaments')
         .select("*")
         .eq('organizer_id', organizerId)
 
