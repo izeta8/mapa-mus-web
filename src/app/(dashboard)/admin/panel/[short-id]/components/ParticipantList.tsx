@@ -1,5 +1,6 @@
 "use client";
 
+import { Couple } from "@/types";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon, UserIcon } from "lucide-react";
@@ -25,7 +26,7 @@ import {
   AlertDialogTrigger 
 } from "@/components/ui/alert-dialog";
 
-export function ParticipantList({ couples }: { couples: any[] }) {
+export function ParticipantList({ couples }: { couples: Couple[] }) {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
