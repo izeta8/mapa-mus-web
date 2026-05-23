@@ -25,3 +25,19 @@ export interface TournamentFull extends Tournament {
   matches: MatchWithCouples[];
   couples: Couple[];
 }
+
+export interface Prize {
+  rank: number;
+  description: string;
+  cash: number;
+  tags?: string[];
+}
+
+export interface Contact {
+  name: string | null;
+  phone: string | null;
+  is_whatsapp: boolean;
+  instagram: string | null;
+  facebook: string | null;
+  email: string | null;
+}
