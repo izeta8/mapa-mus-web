@@ -10,11 +10,13 @@ export function AutoRedirect({ shortId }: AutoRedirectProps) {
       {`
         (function() {
           const isAndroid = /Android/i.test(navigator.userAgent);
-          if (isAndroid) {
-            // Intent URL oficial de Android para Chrome:
-            // Intenta abrir el esquema "mapamus://tournament/${shortId}".
-            // Si la app (com.izeta.mapamus) no está instalada, se queda silenciosamente en la página web.
-            window.location.href = "intent://tournament/${shortId}#Intent;scheme=mapamus;package=com.izeta.mapamus;end;";
+          const hasNoRedirect = window.location.hash.includes('no-redirect');
+          if (isAndroid && !hasNoRedirect) {
+            // Intent URL oficial de Android para Chrome con fallback al propio hash de la página.
+            // Si la app no está instalada, añade '#no-redirect' a la URL sin recargar la página
+            // y evita redirigir al usuario a la Play Store.
+            const fallbackUrl = encodeURIComponent(window.location.href.split('#')[0] + '#no-redirect');
+            window.location.href = "intent://tournament/${shortId}#Intent;scheme=mapamus;package=com.izeta.mapamus;S.browser_fallback_url=" + fallbackUrl + ";end;";
           }
         })();
       `}
