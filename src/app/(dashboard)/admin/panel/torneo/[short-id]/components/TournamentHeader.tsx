@@ -4,7 +4,7 @@ import { TvIcon, MapPinIcon, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { TournamentFull } from "@/types/database";
 import { StartTournamentButton } from "./StartTournamentButton";
-import { SafeDate } from "@/components/ui/safe-date";
+import { SafeDate } from "@/components/ui/custom/SafeDate";
 
 interface Props {
   tournament: TournamentFull;
