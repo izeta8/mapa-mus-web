@@ -155,3 +155,28 @@ export async function updateOrganizer(formData: unknown) {
 
   return { success: true };
 }
+
+export async function verifyOtpCode(formData: { email: string; token: string }) {
+  const { email, token } = formData;
+
+  if (!email || !token) {
+    return { success: false, error: "El correo y el código son obligatorios." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: "signup",
+  });
+
+  if (error) {
+    console.error("Error verifying OTP code:", error);
+    return { success: false, error: "Código inválido o caducado. Inténtalo de nuevo." };
+  }
+
+  revalidatePath("/admin/panel", "layout");
+  revalidatePath("/admin/onboarding");
+
+  return { success: true };
+}
