@@ -31,6 +31,7 @@ Este proyecto es un entorno de aprendizaje continuo de tecnologías web modernas
 - **SRP (Single Responsibility Principle):** Extrae lógica e interfaces complejas (formularios, suscripciones a eventos) a subcomponentes autónomos.
 - **DRY (Don't Repeat Yourself):** Abstrae lógica repetitiva de cálculo o UI en hooks (`/hooks`) o componentes de UI genéricos.
 - **Colocation Estricta:** Componentes específicos de una sola sección o ruta deben colocarse en una subcarpeta `/components` dentro de la propia carpeta de la ruta (ej: `panel/[short-id]/components`).
+- **Idiomas en URL (Spanish URLs):** Toda ruta o segmento de URL público o de administración expuesto al usuario final debe utilizar términos en español (ej. `/admin/panel/[short-id]/editar` en lugar de `/admin/panel/[short-id]/edit`, y `/admin/panel/editar` en lugar de `/admin/panel/edit`).
 
 ### Estructura de Directorios
 - **`src/app/`**: Contiene únicamente la estructura de rutas (`page.tsx`, `layout.tsx`, `route.ts`). Agrupado en `(marketing)`, `(dashboard)`, y `(public-tv)`.
