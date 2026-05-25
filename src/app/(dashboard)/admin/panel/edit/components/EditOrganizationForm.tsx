@@ -61,11 +61,7 @@ export function EditOrganizationForm({ initialData }: EditOrganizationFormProps)
     description: c.description || "",
   })) || [];
 
-  const [contacts, setContacts] = useState<ContactForm[]>(
-    mappedContacts.length > 0
-      ? mappedContacts
-      : [{ name: "", phone: "", is_whatsapp: true, instagram: "", facebook: "", email: "", description: "" }]
-  );
+  const [contacts, setContacts] = useState<ContactForm[]>(mappedContacts);
 
   // Submit Form
   const handleSubmit = async (e: React.FormEvent) => {
@@ -225,11 +221,16 @@ export function EditOrganizationForm({ initialData }: EditOrganizationFormProps)
       </div>
 
       {/* Section: Contacts */}
-      <ContactEditor 
-        contacts={contacts} 
-        onContactsChange={setContacts} 
-        isPending={isPending} 
-      />
+      <div className="space-y-4">
+        <label className="text-xs font-bold text-neutral-600 uppercase tracking-wide">
+          Contactos
+        </label>
+        <ContactEditor 
+          contacts={contacts} 
+          onContactsChange={setContacts} 
+          isPending={isPending} 
+        />
+      </div>
 
       <button
         type="submit"
