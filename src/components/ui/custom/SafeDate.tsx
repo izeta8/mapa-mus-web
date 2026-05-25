@@ -13,7 +13,13 @@ export function SafeDate({ date, className }: Props) {
 
   return (
     <span className={className} suppressHydrationWarning>
-      {d.toLocaleDateString()}
+      {d.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })}
     </span>
   );
 }
