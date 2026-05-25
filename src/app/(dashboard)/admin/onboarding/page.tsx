@@ -125,7 +125,6 @@ export default function OnboardingPage() {
       if (res.success) {
         toast.success("¡Perfil creado correctamente! Redirigiendo al panel...");
         router.push("/admin/panel");
-        router.refresh();
       } else {
         toast.error(res.error || "Ocurrió un error al configurar el perfil.");
       }
