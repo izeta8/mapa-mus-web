@@ -8,6 +8,8 @@ export type Couple = Database['public']['Tables']['couples']['Row']
 export type TournamentStatus = Database['public']['Enums']['tournament_status'];
 
 export type MatchInsert = Database['public']['Tables']['matches']['Insert']
+export type Organizer = Database['public']['Tables']['organizers']['Row']
+export type Player = Database['public']['Tables']['players']['Row']
 
 export interface CoupleInfo {
   id: string;
@@ -40,4 +42,5 @@ export interface Contact {
   instagram: string | null;
   facebook: string | null;
   email: string | null;
+  description: string | null;
 }
