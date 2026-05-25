@@ -25,8 +25,8 @@ export default async function PanelLayout({
     .single();
 
   return (
-    <div className="min-h-screen flex bg-[#F9F9FB]">
-      <aside className="w-64 border-r bg-white p-5 flex flex-col justify-between shadow-sm">
+    <div className="h-screen flex bg-[#F9F9FB] overflow-hidden">
+      <aside className="w-64 border-r bg-white p-5 flex flex-col justify-between shadow-sm shrink-0">
         <div>
           <div className="mb-8 border-b pb-4">
             <h2 className="text-xl font-black text-[#1F1F1F] tracking-tight">
