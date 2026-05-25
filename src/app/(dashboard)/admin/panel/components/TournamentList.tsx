@@ -11,7 +11,15 @@ export async function TournamentList({ organizerId }: { organizerId: string }) {
       <div className="border border-dashed border-zinc-300 rounded-xl p-8 text-center bg-zinc-50">
         <h3 className="text-lg font-semibold text-zinc-900 mb-2">No hay torneos</h3>
         <p className="text-zinc-500 mb-4">Aún no has creado ningún torneo. ¡Anímate a organizar el primero!</p>
-        {/* Aquí iría un botón <Link href="/admin/tournaments/new" className="...btn...">Crear Torneo</Link> */}
+        <Link
+          href="/admin/panel/torneo/crear"
+          className="inline-flex items-center justify-center px-4 py-2.5 bg-[#33AD6A] hover:bg-[#288A56] active:scale-[0.98] text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm gap-2 cursor-pointer"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Crear Torneo
+        </Link>
       </div>
     );
   }
@@ -20,9 +28,9 @@ export async function TournamentList({ organizerId }: { organizerId: string }) {
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {tournaments.map((tournament) => (
 
-        <Link href={`/admin/panel/${tournament.short_id}`} key={tournament.id}>
+        <Link href={`/admin/panel/torneo/${tournament.short_id}`} key={tournament.id}>
           <div className="group relative flex flex-col h-full bg-white border border-zinc-200 rounded-xl p-5 hover:border-green-400 hover:shadow-md transition-all duration-200">
-            
+
             {/* --- CABECERA: Título y Estado --- */}
             <div className="flex justify-between items-start gap-4 mb-4">
               <h3 className="font-bold text-lg leading-tight text-zinc-900 group-hover:text-green-600 transition-colors line-clamp-2">
@@ -36,7 +44,7 @@ export async function TournamentList({ organizerId }: { organizerId: string }) {
               <div className="flex items-center text-sm text-zinc-600">
                 <Calendar className="w-4 h-4 mr-2.5 text-zinc-400 shrink-0" />
                 <SafeDate date={tournament.tournament_date} />
-              </div>              
+              </div>
               <div className="flex items-center text-sm text-zinc-600">
                 <MapPin className="w-4 h-4 mr-2.5 text-zinc-400 shrink-0" />
                 <span className="truncate">{tournament.location}</span>

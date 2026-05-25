@@ -37,10 +37,10 @@ export default async function PanelLayout({
               </p>
             )}
           </div>
-          
+
           <nav className="space-y-1">
-            <Link 
-              href="/admin/panel" 
+            <Link
+              href="/admin/panel"
               className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold text-neutral-700 hover:bg-[#F3F4F6] transition-all duration-200"
             >
               <svg className="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,8 +48,8 @@ export default async function PanelLayout({
               </svg>
               Mis Torneos
             </Link>
-            <Link 
-              href="/admin/panel/edit" 
+            <Link
+              href="/admin/panel/organizacion/editar"
               className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold text-neutral-700 hover:bg-[#F3F4F6] transition-all duration-200"
             >
               <svg className="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,7 +64,7 @@ export default async function PanelLayout({
           <SignOutButton />
         </div>
       </aside>
-      
+
       <main className="flex-1 p-8 overflow-y-auto">{children}</main>
     </div>
   );
