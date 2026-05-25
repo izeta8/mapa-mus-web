@@ -9,6 +9,7 @@ interface MapPickerProps {
   onAddressChange: (address: string) => void;
   onLocationChange: (lat: number | null, lng: number | null) => void;
   isPending: boolean;
+  required?: boolean;
 }
 
 export function MapPicker({
@@ -18,6 +19,7 @@ export function MapPicker({
   onAddressChange,
   onLocationChange,
   isPending,
+  required = false,
 }: MapPickerProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -202,7 +204,7 @@ export function MapPicker({
     <div className="space-y-2.5">
       <div className="flex justify-between items-center">
         <label className="text-xs font-bold text-neutral-600 uppercase tracking-wide block">
-          Dirección física
+          Dirección física {required && <span className="text-red-500">*</span>}
         </label>
         {(address || latitude || longitude) && (
           <button
@@ -220,11 +222,12 @@ export function MapPicker({
         value={address}
         onChange={(e) => onAddressChange(e.target.value)}
         disabled={isPending}
+        required={required}
         placeholder="Busca la dirección en el mapa..."
         className="w-full h-11 px-4 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white"
       />
       <p className="text-[11px] text-neutral-500 leading-relaxed bg-[#F8F9FA] p-3 rounded-xl border border-neutral-100 mt-1">
-        Si se suelen jugar todos los torneos en el mismo sitio se recomienda especificar la ubicación para que al crear los torneos se rellene automáticamente.
+        Busca la dirección en el buscador o haz clic directamente en el mapa para colocar el marcador.
       </p>
 
       {/* Dynamic Google Map */}
@@ -234,6 +237,13 @@ export function MapPicker({
       >
         {!googleMapsLoaded ? "Cargando mapa interactivo..." : ""}
       </div>
+
+      {/* Required marker warning */}
+      {required && !latitude && !longitude && (
+        <p className="text-[11px] text-amber-600 font-semibold flex items-center gap-1.5 mt-1">
+          <span>&#9888;</span> Haz clic en el mapa o busca una dirección para colocar el marcador (obligatorio).
+        </p>
+      )}
 
       {/* Coordinate indicators */}
       {latitude && longitude && (
