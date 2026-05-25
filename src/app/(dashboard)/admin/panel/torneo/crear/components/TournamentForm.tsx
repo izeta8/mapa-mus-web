@@ -4,8 +4,19 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { createTournament, updateTournament } from "@/app/actions/tournaments";
+import { createTournament, updateTournament, deleteTournament } from "@/app/actions/tournaments";
 import { createClient } from "@/lib/supabase/client";
+import { Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { Contact, Prize, TournamentFull } from "@/types/database";
 import { MapPicker } from "@/app/(dashboard)/admin/components/MapPicker";
 import { TournamentGameSettings } from "./TournamentGameSettings";
@@ -224,6 +235,20 @@ export function TournamentForm({
     });
   };
 
+  const handleDelete = () => {
+    if (!initialTournament?.id) return;
+    startTransition(async () => {
+      const res = await deleteTournament(initialTournament.id);
+      if (res.success) {
+        toast.success("Torneo eliminado con éxito.");
+        router.push("/admin/panel");
+        router.refresh();
+      } else {
+        toast.error(res.error || "Ocurrió un error al eliminar el torneo.");
+      }
+    });
+  };
+
   return (
     <div className="space-y-4">
 
@@ -324,26 +349,67 @@ export function TournamentForm({
         </FormSection>
 
         {/* Footer actions */}
-        <div className="flex justify-end gap-3 pt-2">
-          <Link
-            href={mode === "create" ? "/admin/panel" : `/admin/panel`}
-            className="h-11 px-6 border border-[#EAEAEA] hover:bg-neutral-50 active:scale-[0.98] text-neutral-700 font-semibold text-sm rounded-xl transition-all duration-200 flex items-center justify-center cursor-pointer"
-          >
-            Cancelar
-          </Link>
-          <button
-            type="submit"
-            disabled={isPending}
-            className="h-11 px-8 bg-[#33AD6A] hover:bg-[#288A56] active:scale-[0.98] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            {isPending ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : mode === "create" ? (
-              "Crear Torneo"
-            ) : (
-              "Guardar Cambios"
+        <div className="flex justify-between items-center pt-2">
+          {/* Left: Delete Tournament (Only in Edit mode) */}
+          <div>
+            {mode === "edit" && initialTournament?.id && (
+              <AlertDialog>
+                <AlertDialogTrigger
+                  render={
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      className="h-11 px-5 border border-red-200 hover:bg-red-50 text-red-600 font-semibold text-sm rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Eliminar Torneo
+                    </button>
+                  }
+                />
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>¿Eliminar Torneo?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta acción es permanente y no se puede deshacer.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <button
+                      onClick={handleDelete}
+                      disabled={isPending}
+                      className="inline-flex items-center justify-center h-8 gap-1.5 px-4 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md shadow-sm transition-all duration-200 disabled:opacity-50 cursor-pointer"
+                    >
+                      {isPending ? "Eliminando..." : "Eliminar Torneo"}
+                    </button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
-          </button>
+          </div>
+
+          {/* Right: Cancel & Update/Create */}
+          <div className="flex items-center gap-3">
+            <Link
+              href={mode === "create" ? "/admin/panel" : `/admin/panel`}
+              className="h-11 px-6 border border-[#EAEAEA] hover:bg-neutral-50 active:scale-[0.98] text-neutral-700 font-semibold text-sm rounded-xl transition-all duration-200 flex items-center justify-center cursor-pointer"
+            >
+              Cancelar
+            </Link>
+            <button
+              type="submit"
+              disabled={isPending}
+              className="h-11 px-8 bg-[#33AD6A] hover:bg-[#288A56] active:scale-[0.98] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {isPending ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : mode === "create" ? (
+                "Crear Torneo"
+              ) : (
+                "Guardar Cambios"
+              )}
+            </button>
+          </div>
         </div>
 
       </form>

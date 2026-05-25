@@ -343,3 +343,63 @@ export async function updateTournament(id: string, formData: unknown) {
   revalidatePath(`/torneo/${existing.short_id}`);
   return { success: true, shortId: existing.short_id };
 }
+
+export async function deleteTournament(id: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Usuario no autenticado." };
+  }
+
+  // Verify ownership
+  const { data: existing, error: fetchError } = await supabase
+    .from("tournaments")
+    .select("organizer_id")
+    .eq("id", id)
+    .single();
+
+  if (fetchError || !existing) {
+    return { success: false, error: "No se pudo encontrar el torneo a eliminar." };
+  }
+
+  if (existing.organizer_id !== user.id) {
+    return { success: false, error: "No tienes permisos para eliminar este torneo." };
+  }
+
+  // Delete related matches first due to RESTRICT constraint
+  const { error: matchesError } = await supabase
+    .from("matches")
+    .delete()
+    .eq("tournament_id", id);
+
+  if (matchesError) {
+    console.error("Error deleting matches:", matchesError);
+    return { success: false, error: "No se pudieron eliminar los enfrentamientos del torneo." };
+  }
+
+  // Delete related couples due to RESTRICT constraint
+  const { error: couplesError } = await supabase
+    .from("couples")
+    .delete()
+    .eq("tournament_id", id);
+
+  if (couplesError) {
+    console.error("Error deleting couples:", couplesError);
+    return { success: false, error: "No se pudieron eliminar las parejas del torneo." };
+  }
+
+  // Delete the tournament
+  const { error: tournamentError } = await supabase
+    .from("tournaments")
+    .delete()
+    .eq("id", id);
+
+  if (tournamentError) {
+    console.error("Error deleting tournament:", tournamentError);
+    return { success: false, error: "No se pudo eliminar el torneo. Inténtalo de nuevo." };
+  }
+
+  revalidatePath("/admin/panel");
+  return { success: true };
+}
