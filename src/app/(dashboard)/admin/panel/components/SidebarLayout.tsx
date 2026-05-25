@@ -7,9 +7,11 @@ import { Backdrop } from "./Backdrop";
 
 export function SidebarLayout({
   orgName,
+  isVerified,
   children,
 }: {
   orgName: string | null;
+  isVerified: boolean;
   children: React.ReactNode;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -20,6 +22,7 @@ export function SidebarLayout({
 
       <Sidebar
         orgName={orgName}
+        isVerified={isVerified}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />

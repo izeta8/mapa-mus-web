@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building, Trophy, X, Mail } from "lucide-react";
+import { Building, Trophy, X, Mail, ShieldAlert } from "lucide-react";
 import { SignOutButton } from "./SignOutButton";
 import {
   AlertDialog,
@@ -14,6 +15,8 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { requestAccountVerification } from "@/app/actions/auth";
+import { toast } from "sonner";
 
 const NAV_LINKS = [
   { href: "/admin/panel", label: "Mis Torneos", icon: Trophy },
@@ -22,12 +25,30 @@ const NAV_LINKS = [
 
 export interface SidebarProps {
   orgName: string | null;
+  isVerified: boolean;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function Sidebar({ orgName, isOpen, onClose }: SidebarProps) {
+export function Sidebar({ orgName, isVerified, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const [isPending, setIsPending] = useState(false);
+
+  const handleRequestVerification = async () => {
+    setIsPending(true);
+    try {
+      const res = await requestAccountVerification();
+      if (res.success) {
+        toast.success(res.message || "Solicitud de verificación recibida con éxito.");
+      } else {
+        toast.error(res.error || "No se pudo enviar la solicitud.");
+      }
+    } catch {
+      toast.error("Ocurrió un error al enviar la solicitud de verificación.");
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <aside
@@ -81,6 +102,47 @@ export function Sidebar({ orgName, isOpen, onClose }: SidebarProps) {
       </div>
 
       <div className="border-t pt-4 space-y-2">
+        {!isVerified && (
+          <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 flex flex-col gap-2.5">
+            <div className="flex items-start gap-2.5">
+              <ShieldAlert className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-xs font-bold text-amber-800">Cuenta no verificada</h4>
+                <p className="text-[11px] text-neutral-500 font-medium leading-relaxed mt-1">
+                  Los torneos que publiques no serán visibles hasta que un administrador los valide.
+                </p>
+              </div>
+            </div>
+
+            <AlertDialog>
+              <AlertDialogTrigger
+                render={
+                  <button className="w-full text-center px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer shadow-xs">
+                    Saber más
+                  </button>
+                }
+              />
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Verificación de Cuenta</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Su cuenta no está verificada por los administradores de MapaMus. Los torneos que publiques no serán visibles por la gente hasta que algun administrador lo valide.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cerrar</AlertDialogCancel>
+                  <button
+                    disabled={isPending}
+                    onClick={handleRequestVerification}
+                    className="inline-flex items-center justify-center h-8 px-4 text-xs font-semibold text-white bg-[#33AD6A] hover:bg-[#288A56] disabled:bg-neutral-200 disabled:text-neutral-500 rounded-md shadow-sm transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    {isPending ? "Solicitando..." : "Solicitar Verificación"}
+                  </button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
         <AlertDialog>
           <AlertDialogTrigger
             render={

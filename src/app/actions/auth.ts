@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Contact } from "@/types";
 import { OrganizerSchema } from "@/lib/validations/organizer";
 import { revalidatePath } from "next/cache";
+import { sendTelegramNotification } from "@/lib/telegram";
 
 export async function login(formData: { email: string; password: string }) {
   const supabase = await createClient();
@@ -190,4 +191,43 @@ export async function verifyOtpCode(formData: { email: string; token: string }) 
   revalidatePath("/admin/onboarding");
 
   return { success: true };
+}
+
+export async function requestAccountVerification() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Usuario no autenticado." };
+  }
+
+  const { data: org, error } = await supabase
+    .from("organizers")
+    .select("name, is_verified, slug")
+    .eq("id", user.id)
+    .single();
+
+  if (error || !org) {
+    return { success: false, error: "No se encontró el perfil de organizador." };
+  }
+
+  if (org.is_verified) {
+    return { success: false, error: "Tu cuenta ya está verificada." };
+  }
+
+  const text = `🔔 *Nueva Solicitud de Verificación*\n\n*Organizador:* ${org.name}\n*Email:* ${user.email}\n*ID:* \`${user.id}\`\nPor favor, valida esta cuenta en Supabase.`;
+
+  const result = await sendTelegramNotification(text);
+  if (!result.success) {
+    console.error("Internal Telegram notification failure:", result.error);
+    return {
+      success: false,
+      error: "Ha ocurrido un error interno. Por favor, ponte en contacto con el administrador por correo (mapamusapp@gmail.com)."
+    };
+  }
+
+  return {
+    success: true,
+    message: "Solicitud de verificación recibida. Revisaremos tu cuenta lo antes posible."
+  };
 }

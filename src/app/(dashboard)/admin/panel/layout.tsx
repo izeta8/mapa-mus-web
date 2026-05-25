@@ -18,12 +18,15 @@ export default async function PanelLayout({
   // Get organization info to show in the sidebar
   const { data: org } = await supabase
     .from("organizers")
-    .select("name")
+    .select("name, is_verified")
     .eq("id", user.id)
     .single();
 
   return (
-    <SidebarLayout orgName={org?.name || null}>
+    <SidebarLayout
+      orgName={org?.name || null}
+      isVerified={org?.is_verified ?? false}
+    >
       {children}
     </SidebarLayout>
   );
