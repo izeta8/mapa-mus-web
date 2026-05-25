@@ -3,8 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building, Trophy, Menu, X } from "lucide-react";
+import { Building, Trophy, Menu, X, Mail } from "lucide-react";
 import { SignOutButton } from "./SignOutButton";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 export function SidebarLayout({
   orgName,
@@ -82,7 +92,39 @@ export function SidebarLayout({
           </nav>
         </div>
 
-        <div className="border-t pt-4">
+        <div className="border-t pt-4 space-y-2">
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <button className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm font-semibold text-neutral-500 hover:bg-[#F3F4F6] hover:text-neutral-900 transition-all duration-200 text-left">
+                  <Mail className="w-5 h-5 text-neutral-400" />
+                  Soporte / Contacto
+                </button>
+              }
+            />
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Soporte y Contacto</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Si tienes alguna consulta, sugerencia o necesitas soporte técnico, ponte en contacto con nosotros.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="my-2 p-4 bg-[#F7F7F7] rounded-xl border border-[#EAEAEA] flex flex-col gap-2">
+                <div className="text-[10px] text-neutral-500 font-semibold uppercase tracking-wider">Contacto</div>
+                <div className="text-sm font-bold text-[#1F1F1F]">Equipo de Soporte de Mapa Mus</div>
+                <div className="text-sm text-[#33AD6A] font-bold select-all">mapamusapp@gmail.com</div>
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cerrar</AlertDialogCancel>
+                <a
+                  href="mailto:mapamusapp@gmail.com"
+                  className="inline-flex items-center justify-center h-8 gap-1.5 px-4 text-xs font-semibold text-white bg-[#33AD6A] hover:bg-[#288A56] rounded-md shadow-sm hover:shadow transition-all duration-200"
+                >
+                  Enviar Correo
+                </a>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <SignOutButton />
         </div>
       </aside>
