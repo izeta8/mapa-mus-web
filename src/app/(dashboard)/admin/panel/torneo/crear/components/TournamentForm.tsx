@@ -185,7 +185,7 @@ export function TournamentForm({
 
         if (res.success && res.shortId) {
           toast.success("Torneo creado con éxito.");
-          router.push(`/admin/panel/${res.shortId}`);
+          router.push(`/admin/panel`);
           router.refresh();
         } else {
           toast.error(res.error || "Ocurrió un error al crear el torneo.");
@@ -215,7 +215,7 @@ export function TournamentForm({
 
         if (res.success && res.shortId) {
           toast.success("Torneo actualizado con éxito.");
-          router.push(`/admin/panel/torneo/${res.shortId}`);
+          router.push(`/admin/panel`);
           router.refresh();
         } else {
           toast.error(res.error || "Ocurrió un error al actualizar el torneo.");
@@ -326,7 +326,7 @@ export function TournamentForm({
         {/* Footer actions */}
         <div className="flex justify-end gap-3 pt-2">
           <Link
-            href={mode === "create" ? "/admin/panel" : `/admin/panel/torneo/${initialTournament?.short_id}`}
+            href={mode === "create" ? "/admin/panel" : `/admin/panel`}
             className="h-11 px-6 border border-[#EAEAEA] hover:bg-neutral-50 active:scale-[0.98] text-neutral-700 font-semibold text-sm rounded-xl transition-all duration-200 flex items-center justify-center cursor-pointer"
           >
             Cancelar

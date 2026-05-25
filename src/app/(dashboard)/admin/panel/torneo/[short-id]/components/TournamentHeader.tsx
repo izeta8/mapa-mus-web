@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TvIcon, MapPinIcon, CalendarIcon } from "lucide-react";
+import { TvIcon, MapPinIcon, CalendarIcon, PencilIcon } from "lucide-react";
 import Link from "next/link";
 import { TournamentFull } from "@/types/database";
 import { StartTournamentButton } from "./StartTournamentButton";
@@ -15,6 +15,7 @@ export function TournamentHeader({ tournament, shortId }: Props) {
   const isPlanned = tournament.status === "planned";
   const isOngoing = tournament.status === "ongoing";
   const isFinished = tournament.status === "finished";
+  const isEditable = tournament.status === "planned" || tournament.status === "revision_pending";
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
@@ -48,6 +49,14 @@ export function TournamentHeader({ tournament, shortId }: Props) {
       </div>
 
       <div className="flex items-center gap-4">
+        {isEditable && (
+          <Link href={`/admin/panel/torneo/${shortId}/editar`}>
+            <Button variant="outline" size="lg" className="h-12 px-6 text-base cursor-pointer gap-2">
+              <PencilIcon className="size-4" />
+              Editar
+            </Button>
+          </Link>
+        )}
         <Link href={`/tv/${shortId}`} target="_blank">
           <Button variant="outline" size="lg" className="h-12 px-6 text-base cursor-pointer">
             <TvIcon data-icon="inline-start" className="size-5" />
