@@ -169,10 +169,15 @@ export async function createTournament(formData: unknown) {
       kings_modality: data.kingsModality,
       points_modality: data.pointsModality || null,
       status: status,
-      contacts: org.contacts || [],
-      prizes: [],
+      contacts: data.contacts ?? [],
+      prizes: data.prizes ?? [],
+      rules: data.rules ?? [],
       poster_url: data.posterUrl,
-      registration_info: {}
+      latitude: data.latitude,
+      longitude: data.longitude,
+      registration_info: data.registrationDetails
+        ? { in_person_details: data.registrationDetails, in_app_enabled: false }
+        : {},
     })
     .select("short_id")
     .single();
