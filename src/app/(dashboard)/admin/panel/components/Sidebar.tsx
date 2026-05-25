@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building, Trophy, X, Mail, ShieldAlert } from "lucide-react";
+import { Building, Trophy, X, Mail, ShieldAlert, ShieldCheck } from "lucide-react";
 import { SignOutButton } from "./SignOutButton";
 import {
   AlertDialog,
@@ -102,7 +102,7 @@ export function Sidebar({ orgName, isVerified, isOpen, onClose }: SidebarProps) 
       </div>
 
       <div className="border-t pt-4 space-y-2">
-        {!isVerified && (
+        {!isVerified ? (
           <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 flex flex-col gap-2.5">
             <div className="flex items-start gap-2.5">
               <ShieldAlert className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
@@ -141,6 +141,18 @@ export function Sidebar({ orgName, isVerified, isOpen, onClose }: SidebarProps) 
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+          </div>
+        ) : (
+          <div className="p-3.5 rounded-xl border border-green-200 bg-green-50/50 flex flex-col gap-2">
+            <div className="flex items-start gap-2.5">
+              <ShieldCheck className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-xs font-bold text-green-800">Cuenta verificada</h4>
+                <p className="text-[11px] text-neutral-500 font-medium leading-relaxed mt-1">
+                  Los torneos que publiques se activarán y serán visibles de forma inmediata sin la supervisión de los administradores.
+                </p>
+              </div>
+            </div>
           </div>
         )}
         <AlertDialog>
