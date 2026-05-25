@@ -142,9 +142,6 @@ export default function OnboardingPage() {
 
         {/* Header */}
         <div className="mb-8 border-b pb-6">
-          <span className="text-[10px] font-black uppercase tracking-wider text-[#33AD6A] bg-[#33AD6A]/10 px-2.5 py-1 rounded-full border border-[#33AD6A]/20">
-            Registro de Perfil Comercial
-          </span>
           <h1 className="text-2xl font-black text-[#1F1F1F] mt-3">
             Configura tu Perfil
           </h1>
@@ -221,7 +218,7 @@ export default function OnboardingPage() {
                   }}
                   disabled={isPending}
                   placeholder=""
-                  className="w-full h-11 pl-[125px] pr-4 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white font-mono"
+                  className="w-full h-11 pl-[176px] pr-4 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white font-mono"
                   required
                 />
               </div>
