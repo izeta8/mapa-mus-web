@@ -34,7 +34,7 @@ export default async function EditTournamentPage({ params }: Props) {
       {/* Back button */}
       <div className="mb-6">
         <Link
-          href={`/admin/panel/torneo/${shortId}`}
+          href={`/admin/panel`}
           className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
