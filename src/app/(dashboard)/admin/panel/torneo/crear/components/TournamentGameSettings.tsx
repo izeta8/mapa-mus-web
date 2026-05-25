@@ -103,7 +103,7 @@ export function TournamentGameSettings({
           value={registrationDetails}
           onChange={(e) => onRegistrationDetailsChange(e.target.value)}
           disabled={isPending}
-          placeholder="ej. Inscripción presencial en el bar el día del torneo a partir de las 10:00."
+          placeholder="ej. Inscripción presencial en el local el día del torneo a partir de las 10:00."
           rows={3}
           className="w-full px-4 py-3 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white resize-none"
         />

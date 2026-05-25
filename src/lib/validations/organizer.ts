@@ -24,7 +24,7 @@ export const ContactSchema = z.object({
 });
 
 export const OrganizerSchema = z.object({
-  name: z.string().min(1, "El nombre de la organización es obligatorio.").trim(),
+  name: z.string().min(1, "El nombre del organizador es obligatorio.").trim(),
   slug: z.string()
     .min(1, "El enlace personalizado es obligatorio.")
     .toLowerCase()

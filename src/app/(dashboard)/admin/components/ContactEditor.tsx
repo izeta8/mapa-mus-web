@@ -119,7 +119,7 @@ export function ContactEditor({ contacts, onContactsChange, isPending }: Contact
                     value={contact.email}
                     onChange={(e) => handleContactChange(index, "email", e.target.value)}
                     disabled={isPending}
-                    placeholder="ej. contacto@bar.com"
+                    placeholder="ej. contacto@organizador.com"
                     className="w-full h-10 px-3 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm bg-white"
                   />
                 </div>
@@ -133,7 +133,7 @@ export function ContactEditor({ contacts, onContactsChange, isPending }: Contact
                     value={contact.instagram}
                     onChange={(e) => handleContactChange(index, "instagram", e.target.value)}
                     disabled={isPending}
-                    placeholder="ej. @organizacion"
+                    placeholder="ej. @organizador"
                     className="w-full h-10 px-3 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm bg-white"
                   />
                 </div>
@@ -148,7 +148,7 @@ export function ContactEditor({ contacts, onContactsChange, isPending }: Contact
                   value={contact.facebook}
                   onChange={(e) => handleContactChange(index, "facebook", e.target.value)}
                   disabled={isPending}
-                  placeholder="ej. facebook.com/organizacion"
+                  placeholder="ej. facebook.com/organizador"
                   className="w-full h-10 px-3 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm bg-white"
                 />
               </div>

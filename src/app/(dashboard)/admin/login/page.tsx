@@ -68,7 +68,7 @@ export default function LoginPage() {
             Mapa<span className="text-[#33AD6A]">Mus</span>
           </h1>
           <p className="text-neutral-500 font-semibold text-xs mt-1 uppercase tracking-wider">
-            Portal de la Organización
+            Portal de Organizadores
           </p>
         </div>
 
@@ -107,7 +107,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isPending}
-              placeholder="ejemplo@bar.com"
+              placeholder="ejemplo@organizador.com"
               className="w-full h-11 px-4 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white"
               required
             />

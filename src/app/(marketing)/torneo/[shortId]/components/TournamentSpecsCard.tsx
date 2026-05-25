@@ -28,7 +28,7 @@ export function TournamentSpecsCard({
       <div className="flex items-start gap-3">
         <MapPin className="w-5 h-5 text-[#33AD6A] shrink-0 mt-0.5" />
         <div>
-          <h3 className="text-xs font-bold text-[#737373] uppercase tracking-wider">Ubicación / Bar</h3>
+          <h3 className="text-xs font-bold text-[#737373] uppercase tracking-wider">Ubicación / Sede</h3>
           <p className="text-sm font-semibold text-[#1F1F1F] mt-0.5">{location || 'Por definir'}</p>
           {location && (
             <a

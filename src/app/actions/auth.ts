@@ -66,7 +66,7 @@ export async function setupOrganizer(formData: unknown) {
     .maybeSingle();
 
   if (existingOrg) {
-    return { success: false, error: "Este enlace de la organización ya está registrado. Elige otro." };
+    return { success: false, error: "Este enlace de organizador ya está registrado. Elige otro." };
   }
 
   // Clean contacts: only map the ones with a name (which were validated)
@@ -96,7 +96,7 @@ export async function setupOrganizer(formData: unknown) {
 
   if (error) {
     console.error("Error creating organizer profile:", error);
-    return { success: false, error: "No se pudo guardar el perfil de la organización. Inténtalo de nuevo." };
+    return { success: false, error: "No se pudo guardar el perfil de organizador. Inténtalo de nuevo." };
   }
 
   return { success: true };
@@ -125,7 +125,7 @@ export async function updateOrganizer(formData: unknown) {
     .maybeSingle();
 
   if (existingOrg) {
-    return { success: false, error: "Este enlace ya está registrado por otra organización. Elige otro." };
+    return { success: false, error: "Este enlace ya está registrado por otro organizador. Elige otro." };
   }
 
   // Clean contacts: only map the ones with a name (which were validated)
@@ -156,7 +156,7 @@ export async function updateOrganizer(formData: unknown) {
 
   if (error) {
     console.error("Error updating organizer profile:", error);
-    return { success: false, error: "No se pudo actualizar el perfil de la organización. Inténtalo de nuevo." };
+    return { success: false, error: "No se pudo actualizar el perfil de organizador. Inténtalo de nuevo." };
   }
 
   return { success: true };

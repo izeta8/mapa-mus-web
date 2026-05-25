@@ -71,7 +71,7 @@ export default function TournamentContactsSection({
               <Field label="Nombre de contacto">
                 <input
                   className={inputClass}
-                  placeholder="ej. Karlos, o La Barra"
+                  placeholder="ej. Karlos, o Recepción/Bar"
                   value={contact.name || ""}
                   disabled={isPending}
                   onChange={(e) => update(index, { ...contact, name: e.target.value })}
@@ -93,7 +93,7 @@ export default function TournamentContactsSection({
                 <input
                   type="email"
                   className={inputClass}
-                  placeholder="contacto@bar.com"
+                  placeholder="contacto@organizador.com"
                   value={contact.email || ""}
                   disabled={isPending}
                   onChange={(e) => update(index, { ...contact, email: e.target.value })}

@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { EditOrganizationForm } from "./components/EditOrganizationForm";
+import { EditOrganizerForm } from "./components/EditOrganizerForm";
 
-export default async function EditOrganizationPage() {
+export default async function EditOrganizerPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -24,14 +24,14 @@ export default async function EditOrganizationPage() {
     <div className="max-w-2xl mx-auto py-8">
       <div className="mb-8 border-b pb-6">
         <h1 className="text-2xl font-black text-[#1F1F1F]">
-          Editar Organización
+          Editar Organizador
         </h1>
         <p className="text-neutral-500 text-sm mt-1">
-          Actualiza los datos comerciales y de contacto de tu organización.
+          Actualiza los datos comerciales y de contacto de tu perfil de organizador.
         </p>
       </div>
 
-      <EditOrganizationForm initialData={org} />
+      <EditOrganizerForm initialData={org} />
     </div>
   );
 }

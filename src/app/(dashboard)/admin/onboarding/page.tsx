@@ -49,7 +49,7 @@ export default function OnboardingPage() {
     e.preventDefault();
 
     if (!name.trim()) {
-      toast.error("El nombre de la organización es obligatorio.");
+      toast.error("El nombre del organizador es obligatorio.");
       return;
     }
     if (!slug.trim()) {
@@ -146,10 +146,10 @@ export default function OnboardingPage() {
             Registro de Perfil Comercial
           </span>
           <h1 className="text-2xl font-black text-[#1F1F1F] mt-3">
-            Configura tu Organización
+            Configura tu Perfil
           </h1>
           <p className="text-neutral-500 text-sm mt-1">
-            Rellena los datos comerciales de tu entidad para empezar a publicar torneos.
+            Rellena tus datos para empezar a publicar torneos como organizador.
           </p>
         </div>
 
@@ -159,7 +159,7 @@ export default function OnboardingPage() {
           {/* Section: General info */}
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider border-b pb-1">
-              Datos de la Entidad
+              Datos del Organizador
             </h3>
 
             {/* Avatar / Logo Upload Picker */}
@@ -171,7 +171,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-neutral-600 uppercase tracking-wide">
-                Nombre de la Organización <span className="text-red-500">*</span>
+                Nombre del Organizador <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -184,7 +184,7 @@ export default function OnboardingPage() {
                   }
                 }}
                 disabled={isPending}
-                placeholder="Nombre de tu bar u organización"
+                placeholder="Nombre de tu bar o entidad organizadora"
                 className="w-full h-11 px-4 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white"
                 required
               />
@@ -210,7 +210,7 @@ export default function OnboardingPage() {
               </div>
               <div className="relative flex items-center">
                 <span className="absolute left-4 text-xs font-semibold text-neutral-400 select-none">
-                  mapamus.site/org/
+                  mapamus.site/organizador/
                 </span>
                 <input
                   type="text"

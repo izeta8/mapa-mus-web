@@ -19,7 +19,7 @@ interface ContactForm {
   description: string;
 }
 
-interface EditOrganizationFormProps {
+interface EditOrganizerFormProps {
   initialData: {
     name: string;
     slug: string;
@@ -31,7 +31,7 @@ interface EditOrganizationFormProps {
   };
 }
 
-export function EditOrganizationForm({ initialData }: EditOrganizationFormProps) {
+export function EditOrganizerForm({ initialData }: EditOrganizerFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -68,7 +68,7 @@ export function EditOrganizationForm({ initialData }: EditOrganizationFormProps)
     e.preventDefault();
 
     if (!name.trim()) {
-      toast.error("El nombre de la organización es obligatorio.");
+      toast.error("El nombre del organizador es obligatorio.");
       return;
     }
     if (!slug.trim()) {
@@ -113,7 +113,7 @@ export function EditOrganizationForm({ initialData }: EditOrganizationFormProps)
             const filePath = `${user.id}/logo-${Date.now()}.${ext}`;
 
             const { error: uploadError } = await supabase.storage
-              .from("avatars")
+               .from("avatars")
               .upload(filePath, logoFile, { cacheControl: "3600", upsert: true });
 
             if (uploadError) {
@@ -121,7 +121,7 @@ export function EditOrganizationForm({ initialData }: EditOrganizationFormProps)
               toast.error("Error al subir el logo, se continuará con el anterior o sin él.");
             } else {
               const { data: { publicUrl } } = supabase.storage
-                .from("avatars")
+                 .from("avatars")
                 .getPublicUrl(filePath);
               uploadedLogoUrl = publicUrl;
             }
@@ -156,7 +156,7 @@ export function EditOrganizationForm({ initialData }: EditOrganizationFormProps)
       {/* Section: General info */}
       <div className="space-y-6">
         <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider border-b pb-1">
-          Datos de la Organización
+          Datos del Organizador
         </h3>
 
         {/* Avatar / Logo Upload Picker */}
@@ -168,14 +168,14 @@ export function EditOrganizationForm({ initialData }: EditOrganizationFormProps)
 
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-neutral-600 uppercase tracking-wide">
-            Nombre de la Organización <span className="text-red-500">*</span>
+            Nombre del Organizador <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={isPending}
-            placeholder="Nombre de tu bar u organización"
+            placeholder="Nombre de tu bar o entidad organizadora"
             className="w-full h-11 px-4 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white"
             required
           />
@@ -187,7 +187,7 @@ export function EditOrganizationForm({ initialData }: EditOrganizationFormProps)
           </label>
           <div className="relative flex items-center">
             <span className="absolute left-4 text-xs font-semibold text-neutral-400 select-none font-sans">
-              mapamus.site/org/
+              mapamus.site/organizador/
             </span>
             <input
               type="text"
@@ -197,7 +197,7 @@ export function EditOrganizationForm({ initialData }: EditOrganizationFormProps)
               }}
               disabled={isPending}
               placeholder=""
-              className="w-full h-11 pl-[125px] pr-4 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white font-mono"
+              className="w-full h-11 pl-[150px] pr-4 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white font-mono"
               required
             />
           </div>

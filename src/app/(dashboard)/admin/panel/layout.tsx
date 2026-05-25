@@ -30,7 +30,7 @@ export default async function PanelLayout({
         <div>
           <div className="mb-8 border-b pb-4">
             <h2 className="text-xl font-black text-[#1F1F1F] tracking-tight">
-              Mapa<span className="text-[#33AD6A]">Mus</span> <span className="text-xs font-semibold px-2 py-0.5 bg-[#33AD6A]/10 text-[#288A56] rounded-full border border-[#33AD6A]/20">Organización</span>
+              Mapa<span className="text-[#33AD6A]">Mus</span> <span className="text-xs font-semibold px-2 py-0.5 bg-[#33AD6A]/10 text-[#288A56] rounded-full border border-[#33AD6A]/20">Organizador</span>
             </h2>
             {org && (
               <p className="text-xs text-neutral-500 font-medium mt-1 truncate">
@@ -48,11 +48,11 @@ export default async function PanelLayout({
               Mis Torneos
             </Link>
             <Link
-              href="/admin/panel/organizacion/editar"
+              href="/admin/panel/organizador/editar"
               className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold text-neutral-700 hover:bg-[#F3F4F6] transition-all duration-200"
             >
               <Building />
-              Editar Organización
+              Editar Organizador
             </Link>
           </nav>
         </div>
