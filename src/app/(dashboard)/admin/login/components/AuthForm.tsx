@@ -64,7 +64,7 @@ export function AuthForm({ isLogin, onSuccessSignUp, onPendingChange }: AuthForm
         // Sign Up Flow
         const res = await signUp({ email, password });
         if (res.success) {
-          toast.success("Cuenta registrada. Introduce el código OTP enviado a tu correo.");
+          toast.success("Cuenta registrada. Introduce el código enviado a tu correo.");
           onSuccessSignUp(email);
         } else {
           toast.error(res.error || "Error al registrar la cuenta.");
