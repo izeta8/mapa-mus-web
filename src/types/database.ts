@@ -35,8 +35,8 @@ export interface Prize {
   tags?: string[];
 }
 
-export interface Contact {
-  name: string | null;
+export type Contact = {
+  name: string;
   phone: string | null;
   is_whatsapp: boolean;
   instagram: string | null;
