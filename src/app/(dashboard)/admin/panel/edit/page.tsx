@@ -1,0 +1,37 @@
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { EditOrganizationForm } from "./components/EditOrganizationForm";
+
+export default async function EditOrganizationPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/admin/login");
+  }
+
+  const { data: org } = await supabase
+    .from("organizers")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  if (!org) {
+    redirect("/admin/onboarding");
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto py-8">
+      <div className="mb-8 border-b pb-6">
+        <h1 className="text-2xl font-black text-[#1F1F1F]">
+          Editar Organización
+        </h1>
+        <p className="text-neutral-500 text-sm mt-1">
+          Actualiza los datos comerciales y de contacto de tu organización.
+        </p>
+      </div>
+
+      <EditOrganizationForm initialData={org} />
+    </div>
+  );
+}
