@@ -190,3 +190,66 @@ export async function createTournament(formData: unknown) {
   revalidatePath("/admin/panel");
   return { success: true, shortId: insertedData.short_id };
 }
+
+export async function updateTournament(id: string, formData: unknown) {
+  const result = TournamentSchema.safeParse(formData);
+  if (!result.success) {
+    return { success: false, error: result.error.issues[0].message };
+  }
+
+  const data = result.data;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Usuario no autenticado." };
+  }
+
+  // Verify ownership
+  const { data: existing, error: fetchError } = await supabase
+    .from("tournaments")
+    .select("organizer_id, short_id")
+    .eq("id", id)
+    .single();
+
+  if (fetchError || !existing) {
+    return { success: false, error: "No se pudo encontrar el torneo a editar." };
+  }
+
+  if (existing.organizer_id !== user.id) {
+    return { success: false, error: "No tienes permisos para editar este torneo." };
+  }
+
+  // Update the tournament
+  const { error } = await supabase
+    .from("tournaments")
+    .update({
+      name: data.name,
+      tournament_date: data.tournamentDate,
+      location: data.location,
+      price_per_couple: data.pricePerCouple,
+      max_spots: data.maxSpots,
+      kings_modality: data.kingsModality,
+      points_modality: data.pointsModality || null,
+      contacts: data.contacts ?? [],
+      prizes: data.prizes ?? [],
+      rules: data.rules ?? [],
+      poster_url: data.posterUrl,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      registration_info: data.registrationDetails
+        ? { in_person_details: data.registrationDetails, in_app_enabled: false }
+        : {},
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error updating tournament:", error);
+    return { success: false, error: "No se pudo actualizar el torneo. Inténtalo de nuevo." };
+  }
+
+  revalidatePath("/admin/panel");
+  revalidatePath(`/admin/panel/torneo/${existing.short_id}`);
+  revalidatePath(`/torneo/${existing.short_id}`);
+  return { success: true, shortId: existing.short_id };
+}

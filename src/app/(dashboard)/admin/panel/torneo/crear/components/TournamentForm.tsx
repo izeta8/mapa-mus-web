@@ -4,9 +4,9 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { createTournament } from "@/app/actions/tournaments";
+import { createTournament, updateTournament } from "@/app/actions/tournaments";
 import { createClient } from "@/lib/supabase/client";
-import { Contact, Prize } from "@/types/database";
+import { Contact, Prize, TournamentFull } from "@/types/database";
 import { MapPicker } from "@/app/(dashboard)/admin/components/MapPicker";
 import { TournamentGameSettings } from "./TournamentGameSettings";
 import { TournamentBasicInfoSection } from "./TournamentBasicInfoSection";
@@ -18,7 +18,9 @@ import FormSection from "./FormSection";
 const inputClass =
   "w-full h-11 px-4 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white";
 
-interface CreateTournamentFormProps {
+interface TournamentFormProps {
+  mode: "create" | "edit";
+  initialTournament?: TournamentFull;
   organizerName?: string;
   organizerAddress?: string;
   organizerLatitude?: number | null;
@@ -26,38 +28,77 @@ interface CreateTournamentFormProps {
   organizerContacts?: Contact[];
 }
 
-export function CreateTournamentForm({
+export function TournamentForm({
+  mode,
+  initialTournament,
   organizerName = "",
   organizerAddress = "",
   organizerLatitude = null,
   organizerLongitude = null,
   organizerContacts = [],
-}: CreateTournamentFormProps) {
+}: TournamentFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
+  // Helper to format ISO date to YYYY-MM-DDTHH:mm
+  const formatDateTimeLocal = (dateStr?: string) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   // Basic info
-  const [name, setName] = useState("");
-  const [date, setDate] = useState("");
-  const [pricePerCouple, setPricePerCouple] = useState("");
+  const [name, setName] = useState(mode === "edit" ? initialTournament?.name || "" : "");
+  const [date, setDate] = useState(mode === "edit" ? formatDateTimeLocal(initialTournament?.tournament_date) : "");
+  const [pricePerCouple, setPricePerCouple] = useState(
+    mode === "edit" ? initialTournament?.price_per_couple?.toString() ?? "0" : ""
+  );
   const [posterFile, setPosterFile] = useState<File | null>(null);
-  const [posterPreview, setPosterPreview] = useState<string | null>(null);
+  const [posterPreview, setPosterPreview] = useState<string | null>(
+    mode === "edit" ? initialTournament?.poster_url || null : null
+  );
 
   // Location
-  const [location, setLocation] = useState(organizerAddress);
-  const [latitude, setLatitude] = useState<number | null>(organizerLatitude);
-  const [longitude, setLongitude] = useState<number | null>(organizerLongitude);
+  const [location, setLocation] = useState(
+    mode === "edit" ? initialTournament?.location || "" : organizerAddress
+  );
+  const [latitude, setLatitude] = useState<number | null>(
+    mode === "edit" ? initialTournament?.latitude ?? null : organizerLatitude
+  );
+  const [longitude, setLongitude] = useState<number | null>(
+    mode === "edit" ? initialTournament?.longitude ?? null : organizerLongitude
+  );
 
   // Game settings & inscription
-  const [kingsModality, setKingsModality] = useState<"4" | "8">("4");
-  const [pointsModality, setPointsModality] = useState<"20" | "30" | "40" | null>("20");
-  const [maxSpots, setMaxSpots] = useState("");
-  const [registrationDetails, setRegistrationDetails] = useState("");
+  const [kingsModality, setKingsModality] = useState<"4" | "8">(
+    mode === "edit" ? (initialTournament?.kings_modality as "4" | "8") || "4" : "4"
+  );
+  const [pointsModality, setPointsModality] = useState<"20" | "30" | "40" | null>(
+    mode === "edit" ? (initialTournament?.points_modality as "20" | "30" | "40" | null) ?? "20" : "20"
+  );
+  const [maxSpots, setMaxSpots] = useState(
+    mode === "edit" ? initialTournament?.max_spots?.toString() ?? "" : ""
+  );
+  const [registrationDetails, setRegistrationDetails] = useState(
+    mode === "edit" ? (initialTournament?.registration_info as unknown as { in_person_details?: string })?.in_person_details || "" : ""
+  );
 
-  // Rich content (pre-loaded from org)
-  const [contacts, setContacts] = useState<Contact[]>(organizerContacts);
-  const [prizes, setPrizes] = useState<Prize[]>([]);
-  const [rules, setRules] = useState<string[]>([]);
+  // Rich content
+  const [contacts, setContacts] = useState<Contact[]>(
+    mode === "edit" ? (initialTournament?.contacts as unknown as Contact[]) || [] : organizerContacts
+  );
+  const [prizes, setPrizes] = useState<Prize[]>(
+    mode === "edit" ? (initialTournament?.prizes as unknown as Prize[]) || [] : []
+  );
+  const [rules, setRules] = useState<string[]>(
+    mode === "edit" ? initialTournament?.rules || [] : []
+  );
 
   const handlePosterChange = (file: File) => {
     setPosterFile(file);
@@ -82,68 +123,103 @@ export function CreateTournamentForm({
       return;
     }
 
-    if (!posterFile) {
+    if (mode === "create" && !posterFile) {
       toast.error("El cartel/póster del torneo es obligatorio.");
       return;
     }
 
     startTransition(async () => {
-      // 1. Upload poster
-      let uploadedPosterUrl = "";
-      try {
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+      let uploadedPosterUrl = initialTournament?.poster_url || "";
 
-        if (!user) {
-          toast.error("Usuario no autenticado.");
+      // 1. Upload poster if a new one is selected
+      if (posterFile) {
+        try {
+          const supabase = createClient();
+          const { data: { user } } = await supabase.auth.getUser();
+
+          if (!user) {
+            toast.error("Usuario no autenticado.");
+            return;
+          }
+
+          const ext = posterFile.name.split(".").pop();
+          const filePath = `${user.id}/poster-${Date.now()}.${ext}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from("posters")
+            .upload(filePath, posterFile, { cacheControl: "3600", upsert: true });
+
+          if (uploadError) {
+            console.error("Storage upload error:", uploadError);
+            toast.error("Error al subir el cartel. Inténtalo de nuevo.");
+            return;
+          }
+
+          const { data: { publicUrl } } = supabase.storage.from("posters").getPublicUrl(filePath);
+          uploadedPosterUrl = publicUrl;
+        } catch (err) {
+          console.error("Storage upload catch error:", err);
+          toast.error("Error al subir el cartel.");
           return;
         }
-
-        const ext = posterFile.name.split(".").pop();
-        const filePath = `${user.id}/poster-${Date.now()}.${ext}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("posters")
-          .upload(filePath, posterFile, { cacheControl: "3600", upsert: true });
-
-        if (uploadError) {
-          console.error("Storage upload error:", uploadError);
-          toast.error("Error al subir el cartel. Inténtalo de nuevo.");
-          return;
-        }
-
-        const { data: { publicUrl } } = supabase.storage.from("posters").getPublicUrl(filePath);
-        uploadedPosterUrl = publicUrl;
-      } catch (err) {
-        console.error("Storage upload catch error:", err);
-        toast.error("Error al subir el cartel.");
-        return;
       }
 
-      // 2. Create tournament
-      const res = await createTournament({
-        name,
-        tournamentDate: new Date(date).toISOString(),
-        location,
-        pricePerCouple: parseInt(pricePerCouple, 10),
-        maxSpots: maxSpots ? parseInt(maxSpots, 10) : null,
-        kingsModality,
-        pointsModality,
-        posterUrl: uploadedPosterUrl,
-        latitude,
-        longitude,
-        contacts,
-        prizes,
-        rules,
-        registrationDetails,
-      });
+      // 2. Create or update tournament
+      if (mode === "create") {
+        const res = await createTournament({
+          name,
+          tournamentDate: new Date(date).toISOString(),
+          location,
+          pricePerCouple: parseInt(pricePerCouple, 10),
+          maxSpots: maxSpots ? parseInt(maxSpots, 10) : null,
+          kingsModality,
+          pointsModality,
+          posterUrl: uploadedPosterUrl,
+          latitude,
+          longitude,
+          contacts,
+          prizes,
+          rules,
+          registrationDetails,
+        });
 
-      if (res.success && res.shortId) {
-        toast.success("Torneo creado con éxito.");
-        router.push(`/admin/panel/${res.shortId}`);
-        router.refresh();
+        if (res.success && res.shortId) {
+          toast.success("Torneo creado con éxito.");
+          router.push(`/admin/panel/${res.shortId}`);
+          router.refresh();
+        } else {
+          toast.error(res.error || "Ocurrió un error al crear el torneo.");
+        }
       } else {
-        toast.error(res.error || "Ocurrió un error al crear el torneo.");
+        if (!initialTournament?.id) {
+          toast.error("Error: ID del torneo no disponible para editar.");
+          return;
+        }
+
+        const res = await updateTournament(initialTournament.id, {
+          name,
+          tournamentDate: new Date(date).toISOString(),
+          location,
+          pricePerCouple: parseInt(pricePerCouple, 10),
+          maxSpots: maxSpots ? parseInt(maxSpots, 10) : null,
+          kingsModality,
+          pointsModality,
+          posterUrl: uploadedPosterUrl,
+          latitude,
+          longitude,
+          contacts,
+          prizes,
+          rules,
+          registrationDetails,
+        });
+
+        if (res.success && res.shortId) {
+          toast.success("Torneo actualizado con éxito.");
+          router.push(`/admin/panel/torneo/${res.shortId}`);
+          router.refresh();
+        } else {
+          toast.error(res.error || "Ocurrió un error al actualizar el torneo.");
+        }
       }
     });
   };
@@ -154,10 +230,12 @@ export function CreateTournamentForm({
       {/* Header */}
       <div className="mb-8 border-b pb-6">
         <h1 className="text-2xl font-black text-[#1F1F1F]">
-          Crea un Nuevo Torneo
+          {mode === "create" ? "Crea un Nuevo Torneo" : "Editar Torneo"}
         </h1>
         <p className="text-neutral-500 text-sm mt-1">
-          Rellena los datos para programar y publicar el torneo.
+          {mode === "create"
+            ? "Rellena los datos para programar y publicar el torneo."
+            : "Actualiza los datos para el torneo."}
         </p>
       </div>
 
@@ -248,7 +326,7 @@ export function CreateTournamentForm({
         {/* Footer actions */}
         <div className="flex justify-end gap-3 pt-2">
           <Link
-            href="/admin/panel"
+            href={mode === "create" ? "/admin/panel" : `/admin/panel/torneo/${initialTournament?.short_id}`}
             className="h-11 px-6 border border-[#EAEAEA] hover:bg-neutral-50 active:scale-[0.98] text-neutral-700 font-semibold text-sm rounded-xl transition-all duration-200 flex items-center justify-center cursor-pointer"
           >
             Cancelar
@@ -260,8 +338,10 @@ export function CreateTournamentForm({
           >
             {isPending ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
+            ) : mode === "create" ? (
               "Crear Torneo"
+            ) : (
+              "Guardar Cambios"
             )}
           </button>
         </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CreateTournamentForm } from "./components/CreateTournamentForm";
+import { TournamentForm } from "./components/TournamentForm";
 import { createClient } from "@/lib/supabase/server";
 import { Contact } from "@/types/database";
 
@@ -45,7 +45,8 @@ export default async function NewTournamentPage() {
         </Link>
       </div>
 
-      <CreateTournamentForm 
+      <TournamentForm 
+        mode="create"
         organizerName={organizerName} 
         organizerAddress={organizerAddress} 
         organizerLatitude={organizerLatitude}
