@@ -1,7 +1,7 @@
 import { getOrganizerTournaments } from "@/services/tournaments";
-import { Calendar, Coins, Crown, MapPin, Users } from "lucide-react";
+import { Bean, Calendar, Coins, Crown, Edit, Euro, MapPin, Trophy, Users } from "lucide-react";
 import Link from "next/link";
-import { SafeDate } from "@/components/ui/safe-date";
+import { SafeDate } from "@/components/ui/custom/SafeDate";
 
 export async function TournamentList({ organizerId }: { organizerId: string }) {
   const tournaments = await getOrganizerTournaments(organizerId);
@@ -54,19 +54,30 @@ export async function TournamentList({ organizerId }: { organizerId: string }) {
                 <Crown className="w-4 h-4 mr-2.5 text-zinc-400 shrink-0" />
                 {tournament.kings_modality === '8' ? 'A 8 Reyes' : 'A 4 Reyes'}
               </div>
+
+              <div className="flex items-center text-sm text-zinc-600">
+                <Bean className="w-4 h-4 mr-2.5 text-zinc-400 shrink-0" />
+                {tournament.points_modality ? `A ${tournament.points_modality} tantos` : 'Sin Definir'}
+              </div>
+
+              <div className="flex items-center text-sm text-zinc-600">
+                <Euro className="w-4 h-4 mr-2.5 text-zinc-400 shrink-0" />
+                {tournament.price_per_couple ? `${tournament.price_per_couple}€` : 'Sin definir'}
+              </div>
+
+              <div className="flex items-center text-sm text-zinc-600">
+                <Users className="w-4 h-4 mr-1.5 text-zinc-400" />
+                {tournament.max_spots ? `Max ${tournament.max_spots} parejas` : 'Sin límite'}
+              </div>
             </div>
 
-            {/* --- PIE: Cifras y Datos (Separado por una línea) --- */}
-            <div className="pt-4 border-t border-zinc-100 flex items-center justify-between text-sm">
-              <div className="flex items-center font-medium text-zinc-900">
-                <Users className="w-4 h-4 mr-1.5 text-zinc-400" />
-                {tournament.max_spots ? `Max ${tournament.max_spots} par.` : 'Sin límite'}
-              </div>
-              <div className="flex items-center font-bold text-zinc-900 bg-zinc-100 px-2.5 py-1 rounded-md">
-                <Coins className="w-4 h-4 mr-1.5 text-amber-500" />
-                {tournament.price_per_couple ? `${tournament.price_per_couple}€` : 'Gratis'}
-              </div>
-            </div>
+            <Link
+              href="/admin/panel/torneo/editar"
+              className="inline-flex items-center justify-center px-4 py-2.5 bg-[#33AD6A] hover:bg-[#288A56] active:scale-[0.98] text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm gap-2 cursor-pointer"
+            >
+              <Edit />
+              Editar Torneo
+            </Link>
 
           </div>
         </Link>
