@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { buildMatchesTree, coupleAsignation, nearestPowerOfTwo, shuffleAlgorithm } from "@/lib/utils";
 import { Couple, MatchInsert } from "@/types/database";
 import { revalidatePath } from "next/cache";
-import { updateTournamentStatus } from "./tournaments";
+import { updateTournamentStatus, verifyTournamentOwnership } from "./tournaments";
 
 export async function fetchTournamentCouples(tournamentId: string): Promise<Couple[]> {
 
@@ -25,15 +25,11 @@ export async function fetchTournamentCouples(tournamentId: string): Promise<Coup
 }
 
 export async function storeGeneratedBracket(tournamentId: string, bracket: MatchInsert[]) {
-
-    /**
-     * TODO: SECURITY CHECK (Pending Auth Implementation)
-     * 1. Obtener sesión: const { data: { user } } = await supabase.auth.getUser();
-     * 2. Validar propiedad: Verificar que user.id === tournament.organizer_id
-     * 3. Abortar si no es el dueño para evitar ataques de enumeración de IDs.
-     */
-
     const supabase = await createClient();
+    const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+    if (!isOwner) {
+        throw new Error("No autorizado para modificar este torneo.");
+    }
 
     // Clear a possible previous bracket before inserting the new one
     const { error: deleteError } = await supabase
@@ -58,8 +54,12 @@ export async function storeGeneratedBracket(tournamentId: string, bracket: Match
 }
 
 export async function generateBracket(tournamentId: string) {
-
     try {
+        const supabase = await createClient();
+        const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+        if (!isOwner) {
+            return { success: false, error: "No autorizado para modificar este torneo." };
+        }
 
         // Fetch couples and calculate the dimension of the bracket.
         const couples = await fetchTournamentCouples(tournamentId);

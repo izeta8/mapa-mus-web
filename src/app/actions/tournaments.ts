@@ -3,6 +3,46 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { TournamentSchema } from "@/lib/validations/tournament";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "@/types/supabase";
+
+export async function verifyTournamentOwnership(supabase: SupabaseClient<Database>, tournamentId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+
+  const { data: tournament, error } = await supabase
+    .from("tournaments")
+    .select("organizer_id")
+    .eq("id", tournamentId)
+    .maybeSingle();
+
+  if (error || !tournament) {
+    return false;
+  }
+  return tournament.organizer_id === user.id;
+}
+
+export async function getTournamentIdByCoupleId(supabase: SupabaseClient<Database>, coupleId: string): Promise<string | null> {
+  const { data: couple, error } = await supabase
+    .from("couples")
+    .select("tournament_id")
+    .eq("id", coupleId)
+    .maybeSingle();
+
+  if (error || !couple) return null;
+  return couple.tournament_id;
+}
+
+export async function getTournamentIdByMatchId(supabase: SupabaseClient<Database>, matchId: string): Promise<string | null> {
+  const { data: match, error } = await supabase
+    .from("matches")
+    .select("tournament_id")
+    .eq("id", matchId)
+    .maybeSingle();
+
+  if (error || !match) return null;
+  return match.tournament_id;
+}
 
 export async function addCouple(formData: { 
   tournamentId: string, 
@@ -11,6 +51,11 @@ export async function addCouple(formData: {
   coupleNumber: number 
 }) {
   const supabase = await createClient();
+
+  const isOwner = await verifyTournamentOwnership(supabase, formData.tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No autorizado para modificar este torneo." };
+  }
 
   const { error } = await supabase
     .from('couples')
@@ -33,6 +78,16 @@ export async function addCouple(formData: {
 export async function deleteCouple(coupleId: string) {
   const supabase = await createClient();
 
+  const tournamentId = await getTournamentIdByCoupleId(supabase, coupleId);
+  if (!tournamentId) {
+    return { success: false, error: "Pareja no encontrada." };
+  }
+
+  const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No autorizado para modificar este torneo." };
+  }
+
   const { error } = await supabase
     .from('couples')
     .delete()
@@ -49,6 +104,16 @@ export async function deleteCouple(coupleId: string) {
 
 export async function updateMatchTable(matchId: string, tableNumber: string | null) {
   const supabase = await createClient();
+
+  const tournamentId = await getTournamentIdByMatchId(supabase, matchId);
+  if (!tournamentId) {
+    return { success: false, error: "Partido no encontrado." };
+  }
+
+  const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No autorizado para modificar este torneo." };
+  }
 
   const { error } = await supabase
     .from('matches')
@@ -67,6 +132,16 @@ export async function updateMatchTable(matchId: string, tableNumber: string | nu
 export async function setMatchWinner(matchId: string, winnerId: string) {
   const supabase = await createClient();
 
+  const tournamentId = await getTournamentIdByMatchId(supabase, matchId);
+  if (!tournamentId) {
+    return { success: false, error: "Partido no encontrado." };
+  }
+
+  const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No autorizado para modificar este torneo." };
+  }
+
   const { error } = await supabase.rpc('advance_winner', {
     p_match_id: matchId,
     p_winner_id: winnerId
@@ -83,6 +158,16 @@ export async function setMatchWinner(matchId: string, winnerId: string) {
 
 export async function rollbackMatchWinner(matchId: string) {
   const supabase = await createClient();
+
+  const tournamentId = await getTournamentIdByMatchId(supabase, matchId);
+  if (!tournamentId) {
+    return { success: false, error: "Partido no encontrado." };
+  }
+
+  const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No autorizado para modificar este torneo." };
+  }
 
   const { error } = await supabase.rpc('rollback_winner', {
     p_match_id: matchId
@@ -113,6 +198,11 @@ export async function updateTournamentStatus(tournamentId: string, status: 'ongo
 
 export async function advanceTournamentRound(tournamentId: string, round: number) {
   const supabase = await createClient();
+
+  const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No autorizado para modificar este torneo." };
+  }
 
   const { error } = await supabase
     .from('tournaments')
