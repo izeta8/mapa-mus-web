@@ -42,7 +42,7 @@ export function TournamentBasicInfoSection({
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
           disabled={isPending}
-          placeholder={organizerName ? `Torneo de Mus de ${organizerName}` : "ej. I Torneo de Mus Sede Atxuri"}
+          placeholder={organizerName ? `Torneo de Mus de ${organizerName}` : "Nombre del torneo"}
           className={inputClass}
           required
         />

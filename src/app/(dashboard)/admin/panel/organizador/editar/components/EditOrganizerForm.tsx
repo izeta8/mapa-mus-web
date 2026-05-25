@@ -192,17 +192,14 @@ export function EditOrganizerForm({ initialData }: EditOrganizerFormProps) {
             <input
               type="text"
               value={slug}
-              onChange={(e) => {
-                setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"));
-              }}
-              disabled={isPending}
+              disabled={true}
               placeholder=""
-              className="w-full h-11 pl-[150px] pr-4 border border-[#EAEAEA] hover:border-neutral-300 focus:border-[#33AD6A] focus:ring-1 focus:ring-[#33AD6A] outline-none rounded-xl text-sm transition-all duration-200 bg-neutral-50 focus:bg-white font-mono"
+              className="w-full h-11 pl-[177px] pr-4 border border-[#EAEAEA] rounded-xl text-sm bg-neutral-100 text-neutral-400 cursor-not-allowed select-none font-mono"
               required
             />
           </div>
-          <p className="text-[10px] text-neutral-400 font-medium">
-            Este será el enlace de tu perfil para compartir tus torneos directamente.
+          <p className="text-[10px] text-[#737373] font-medium">
+            Este enlace es único y no se puede modificar. Para realizar cambios, ponte en contacto con el administrador de MapaMus.
           </p>
         </div>
 

@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Contact } from "@/types";
 import { OrganizerSchema } from "@/lib/validations/organizer";
+import { revalidatePath } from "next/cache";
 
 export async function login(formData: { email: string; password: string }) {
   const supabase = await createClient();
@@ -99,6 +100,9 @@ export async function setupOrganizer(formData: unknown) {
     return { success: false, error: "No se pudo guardar el perfil de organizador. Inténtalo de nuevo." };
   }
 
+  revalidatePath("/admin/panel", "layout");
+  revalidatePath("/admin/onboarding");
+
   return { success: true };
 }
 
@@ -114,18 +118,6 @@ export async function updateOrganizer(formData: unknown) {
 
   if (!user) {
     return { success: false, error: "Usuario no autenticado." };
-  }
-
-  // Check if slug is already taken by another organizer
-  const { data: existingOrg } = await supabase
-    .from("organizers")
-    .select("id")
-    .eq("slug", data.slug)
-    .neq("id", user.id)
-    .maybeSingle();
-
-  if (existingOrg) {
-    return { success: false, error: "Este enlace ya está registrado por otro organizador. Elige otro." };
   }
 
   // Clean contacts: only map the ones with a name (which were validated)
@@ -145,7 +137,6 @@ export async function updateOrganizer(formData: unknown) {
     .from("organizers")
     .update({
       name: data.name,
-      slug: data.slug,
       address: data.address,
       contacts: cleanedContacts,
       latitude: data.latitude,
@@ -158,6 +149,9 @@ export async function updateOrganizer(formData: unknown) {
     console.error("Error updating organizer profile:", error);
     return { success: false, error: "No se pudo actualizar el perfil de organizador. Inténtalo de nuevo." };
   }
+
+  revalidatePath("/admin/panel", "layout");
+  revalidatePath("/admin/panel/organizador/editar");
 
   return { success: true };
 }

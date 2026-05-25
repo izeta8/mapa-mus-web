@@ -223,7 +223,7 @@ export default function OnboardingPage() {
                 />
               </div>
               <p className="text-[10px] text-neutral-400 font-medium">
-                Este será el enlace de tu perfil para compartir tus torneos directamente.
+                Este será el enlace de tu perfil para compartir tus torneos directamente. <strong className="text-neutral-500 font-semibold">Una vez creado, no se podrá modificar sin contactar al administrador.</strong>
               </p>
             </div>
 
