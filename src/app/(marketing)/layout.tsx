@@ -20,13 +20,7 @@ export default function MarketingLayout({
             />
             <span>Mapa<span className="text-[#33AD6A]">Mus</span></span>
           </Link>
-          <div className="flex items-center gap-6">
-            <Link
-              href="/admin/panel"
-              className="text-sm font-semibold text-[#737373] hover:text-[#1F1F1F] transition-colors duration-200"
-            >
-              Área de Organizadores
-            </Link>
+          <div className="flex items-center gap-8">
             <a
               href="https://play.google.com/store/apps/details?id=com.izeta.mapamus"
               target="_blank"
@@ -35,6 +29,12 @@ export default function MarketingLayout({
             >
               Descargar App
             </a>
+            <Link
+              href="/admin/panel"
+              className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-[#1F1F1F] bg-white border border-[#EAEAEA] hover:border-[#1F1F1F] hover:bg-[#F7F7F7] rounded-full shadow-sm hover:shadow transition-all duration-200 active:scale-[0.98]"
+            >
+              Área de Organizaciones
+            </Link>
           </div>
         </nav>
       </header>
