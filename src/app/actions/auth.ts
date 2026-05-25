@@ -23,7 +23,7 @@ export async function login(formData: { email: string; password: string }) {
 export async function signUp(formData: { email: string; password: string }) {
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: formData.email,
     password: formData.password,
     options: {
@@ -34,7 +34,18 @@ export async function signUp(formData: { email: string; password: string }) {
   });
 
   if (error) {
+    if (error.message.toLowerCase().includes("rate limit") || error.status === 429) {
+      return {
+        success: false,
+        error: "Se han realizado demasiadas solicitudes. Por límites de la infraestructura no se pueden crear más cuentas hoy. Por favor, inténtalo de nuevo dentro de unas horas."
+      };
+    }
     return { success: false, error: error.message };
+  }
+
+  // Supabase returns a user with an empty identities array if the email is already registered
+  if (data.user && (!data.user.identities || data.user.identities.length === 0)) {
+    return { success: false, error: "Este correo electrónico ya está registrado. Inicia sesión en su lugar." };
   }
 
   return { success: true };
