@@ -112,6 +112,18 @@ export async function setupOrganizer(formData: unknown) {
     return { success: false, error: "No se pudo guardar el perfil de organizador. Inténtalo de nuevo." };
   }
 
+  // Send Telegram notification
+  const telegramText = `🆕 *Nuevo Organizador Registrado*\n\n` +
+    `*Nombre:* ${data.name}\n` +
+    `*Slug:* ${data.slug}\n` +
+    `*Email:* ${user.email}\n` +
+    `*Dirección:* ${data.address || "No proporcionada"}`;
+
+  const telegramResult = await sendTelegramNotification(telegramText);
+  if (!telegramResult.success) {
+    console.error("Warning: Failed to send Telegram notification for new organizer profile setup:", telegramResult.error);
+  }
+
   revalidatePath("/admin/panel", "layout");
   revalidatePath("/admin/onboarding");
 

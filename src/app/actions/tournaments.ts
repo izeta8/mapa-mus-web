@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { TournamentSchema } from "@/lib/validations/tournament";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "@/types/supabase";
+import { sendTelegramNotification } from "@/lib/telegram";
 
 export async function verifyTournamentOwnership(supabase: SupabaseClient<Database>, tournamentId: string) {
   const { data: { user } } = await supabase.auth.getUser();
@@ -235,7 +236,7 @@ export async function createTournament(formData: unknown) {
   // 1. Get organization verification status and default contacts
   const { data: org, error: orgError } = await supabase
     .from("organizers")
-    .select("is_verified, contacts")
+    .select("name, is_verified, contacts")
     .eq("id", user.id)
     .single();
 
@@ -269,12 +270,31 @@ export async function createTournament(formData: unknown) {
         ? { in_person_details: data.registrationDetails, in_app_enabled: false }
         : {},
     })
-    .select("short_id")
+    .select("id, short_id")
     .single();
 
   if (error) {
     console.error("Error creating tournament:", error);
     return { success: false, error: "No se pudo guardar el torneo. Inténtalo de nuevo." };
+  }
+
+  // Send Telegram notification
+  const isVerified = org.is_verified;
+  const tournamentLink = isVerified
+    ? `https://mapamus.com/torneos/${insertedData.short_id}`
+    : `https://mapa-mus-mitm.vercel.app/?id=${insertedData.id}`;
+
+  const telegramText = `🏆 *Nuevo Torneo Creado*\n\n` +
+    `*Torneo:* ${data.name}\n` +
+    `*Organizador:* ${org.name || "Desconocido"}\n` +
+    `*Fecha:* ${data.tournamentDate}\n` +
+    `*Ubicación:* ${data.location}\n` +
+    `*Estado:* ${isVerified ? "🟢 Activo (Verificado)" : "🟡 Pendiente de revisión"}\n` +
+    `*Enlace:* [Ver/Gestionar](${tournamentLink})`;
+
+  const telegramResult = await sendTelegramNotification(telegramText);
+  if (!telegramResult.success) {
+    console.error("Warning: Failed to send Telegram notification for new tournament:", telegramResult.error);
   }
 
   revalidatePath("/admin/panel");
