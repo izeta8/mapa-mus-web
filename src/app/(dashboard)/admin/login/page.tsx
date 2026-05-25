@@ -61,14 +61,14 @@ export default function LoginPage() {
       <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-[#33AD6A]/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
       <div className="w-full max-w-md bg-white border border-[#EAEAEA] rounded-2xl p-8 shadow-sm relative z-10 transition-all duration-300">
-        
+
         {/* Logo / Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-black tracking-tight text-[#1F1F1F]">
             Mapa<span className="text-[#33AD6A]">Mus</span>
           </h1>
           <p className="text-neutral-500 font-semibold text-xs mt-1 uppercase tracking-wider">
-            Portal de Hostelería
+            Portal de la Organización
           </p>
         </div>
 
@@ -77,22 +77,20 @@ export default function LoginPage() {
           <button
             onClick={() => setIsLogin(true)}
             disabled={isPending}
-            className={`flex-1 text-center py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 ${
-              isLogin
-                ? "bg-white text-[#1F1F1F] shadow-sm border border-neutral-100"
-                : "text-neutral-500 hover:text-neutral-900"
-            }`}
+            className={`flex-1 text-center py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 ${isLogin
+              ? "bg-white text-[#1F1F1F] shadow-sm border border-neutral-100"
+              : "text-neutral-500 hover:text-neutral-900"
+              }`}
           >
             Iniciar Sesión
           </button>
           <button
             onClick={() => setIsLogin(false)}
             disabled={isPending}
-            className={`flex-1 text-center py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 ${
-              !isLogin
-                ? "bg-white text-[#1F1F1F] shadow-sm border border-neutral-100"
-                : "text-neutral-500 hover:text-neutral-900"
-            }`}
+            className={`flex-1 text-center py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 ${!isLogin
+              ? "bg-white text-[#1F1F1F] shadow-sm border border-neutral-100"
+              : "text-neutral-500 hover:text-neutral-900"
+              }`}
           >
             Crear Cuenta
           </button>
