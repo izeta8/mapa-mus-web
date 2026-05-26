@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Tournament, Prize } from "@/types/database";
 import { SafeDate } from "@/components/ui/custom/SafeDate";
-import { Calendar, MapPin, Award } from "lucide-react";
+import { Calendar, MapPin, Award, MapPinned, ExternalLink } from "lucide-react";
 
 interface TournamentCardProps {
   tournament: Tournament;
@@ -98,11 +98,10 @@ export function TournamentCard({
 
   return (
     <div
-      onClick={onClick}
-      className={`p-5 bg-white border rounded-2xl transition-all duration-200 cursor-pointer flex flex-col justify-between ${
+      className={`p-5 bg-white border rounded-2xl transition-all duration-200 flex flex-col justify-between ${
         isSelected
           ? "border-[#33AD6A] ring-1 ring-[#33AD6A] shadow-md bg-[#33AD6A]/[0.01]"
-          : "border-[#EAEAEA] hover:border-zinc-300 shadow-sm hover:shadow"
+          : "border-[#EAEAEA] shadow-sm"
       }`}
     >
       <div className="space-y-3">
@@ -120,7 +119,7 @@ export function TournamentCard({
         </div>
 
         <div className="space-y-1">
-          <h3 className="font-extrabold text-lg text-[#1F1F1F] leading-snug group-hover:text-[#33AD6A] transition-colors">
+          <h3 className="font-extrabold text-lg text-[#1F1F1F] leading-snug">
             {tournament.name}
           </h3>
         </div>
@@ -148,16 +147,20 @@ export function TournamentCard({
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-neutral-100 flex items-center justify-between gap-4">
-        <span className="text-[11px] text-neutral-400">
-          Código: <span className="font-mono">{tournament.short_id}</span>
-        </span>
+      <div className="mt-4 pt-4 border-t border-neutral-100 flex items-center gap-2">
+        <button
+          onClick={onClick}
+          className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-[#737373] hover:text-[#288A56] bg-neutral-100 hover:bg-[#33AD6A]/10 border border-neutral-200 hover:border-[#33AD6A]/30 rounded-xl transition-all duration-200 active:scale-[0.97] cursor-pointer"
+        >
+          <MapPinned className="w-3.5 h-3.5" />
+          Ver en el mapa
+        </button>
         <Link
           href={`/torneo/${tournament.short_id}`}
-          onClick={(e) => e.stopPropagation()} // Prevent card click trigger
-          className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-[#288A56] hover:text-white bg-[#33AD6A]/10 hover:bg-[#33AD6A] border border-[#33AD6A]/20 hover:border-transparent rounded-xl transition-all duration-200 active:scale-[0.97] cursor-pointer"
+          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-[#288A56] hover:text-white bg-[#33AD6A]/10 hover:bg-[#33AD6A] border border-[#33AD6A]/20 hover:border-transparent rounded-xl transition-all duration-200 active:scale-[0.97] cursor-pointer"
         >
-          Ver Detalles
+          <ExternalLink className="w-3.5 h-3.5" />
+          Ir al torneo
         </Link>
       </div>
     </div>
