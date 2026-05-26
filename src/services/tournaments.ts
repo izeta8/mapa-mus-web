@@ -56,3 +56,25 @@ export async function getOrganizerTournaments(organizerId: string): Promise<Tour
 
     return tournaments
 }
+
+export async function getPublicActiveTournaments(): Promise<Tournament[] | null> {
+  const supabase = await createClient();
+
+  // Filter out tournaments older than 12 hours ago to allow active/ongoing tournaments
+  // of today to remain visible on the map while they are running.
+  const thresholdDate = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+
+  const { data: tournaments, error } = await supabase
+    .from("tournaments")
+    .select("*")
+    .in("status", ["planned", "ongoing"])
+    .gte("tournament_date", thresholdDate)
+    .order("tournament_date", { ascending: true });
+
+  if (error || !tournaments) {
+    console.error("Error fetching public active tournaments:", error);
+    return null;
+  }
+
+  return tournaments;
+}
