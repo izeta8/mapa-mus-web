@@ -35,7 +35,7 @@ export function Header() {
             href="/admin/panel"
             className="inline-flex items-center justify-center px-3 py-1.5 min-[500px]:px-4 min-[500px]:py-2 text-xs min-[500px]:text-sm font-semibold text-[#1F1F1F] bg-white border border-[#EAEAEA] hover:border-[#1F1F1F] hover:bg-[#F7F7F7] rounded-full shadow-sm hover:shadow transition-all duration-200 active:scale-[0.98]"
           >
-            <span className="hidden min-[500px]:inline">Área de Organizaciones</span>
+            <span className="hidden min-[500px]:inline">Área de Organizadores</span>
             <span className="inline min-[500px]:hidden">Organización</span>
           </Link>
         </div>
