@@ -227,7 +227,11 @@ export async function requestAccountVerification() {
     return { success: false, error: "Tu cuenta ya está verificada." };
   }
 
-  const text = `🔔 *Nueva Solicitud de Verificación*\n\n*Organizador:* ${org.name}\n*Email:* ${user.email}\n*ID:* \`${user.id}\`\nPor favor, valida esta cuenta en Supabase.`;
+  const text = `🔔 *Nueva Solicitud de Verificación*\n\n` +
+    `*Organizador:* ${org.name}\n` +
+    `*Email:* ${user.email}\n` +
+    `*ID:* \`${user.id}\`\n\n` +
+    `[Panel de Control](https://mapa-mus-mitm.vercel.app/organizers)`;
 
   const result = await sendTelegramNotification(text);
   if (!result.success) {
