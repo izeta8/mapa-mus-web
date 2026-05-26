@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PhoneMockup } from "./PhoneMockup";
 
 export function HeroSection() {
@@ -26,17 +27,24 @@ export function HeroSection() {
               Tu mapa de referencia para competir al mus. Localiza torneos en tu zona, accede a sus bases al instante y mantente al día de cada campeonato, todo de forma gratuita y en segundos.
             </p>
             
-            {/* App Download Buttons */}
-            <div className="flex flex-wrap gap-4 pt-2">
+            {/* App Action Buttons */}
+            <div className="flex flex-wrap gap-4 pt-2 items-center">
+              <Link
+                href="/torneos"
+                className="h-12 px-6 bg-[#33AD6A] hover:bg-[#288A56] text-white font-extrabold text-sm rounded-xl flex items-center justify-center transition-all duration-200 shadow-md hover:shadow hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              >
+                Buscar Torneos en la Web
+              </Link>
+
               {/* Google Play Badge */}
               <a
                 href="https://play.google.com/store/apps/details?id=com.izeta.mapamus"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-12 bg-black text-white hover:bg-neutral-900 rounded-xl flex items-center px-4 transition-all duration-200 border border-neutral-800 shadow-sm hover:shadow hover:scale-[1.02]"
+                className="h-12 bg-white text-[#1F1F1F] hover:bg-[#F7F7F7] border border-[#EAEAEA] hover:border-neutral-300 rounded-xl flex items-center px-4 transition-all duration-200 shadow-sm hover:shadow hover:scale-[1.02] active:scale-[0.98]"
                 aria-label="Descargar en Google Play"
               >
-                <svg className="w-5 h-5 fill-current mr-3" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 fill-current mr-3 text-neutral-700" viewBox="0 0 24 24">
                   <path d="M5.25 3.03C5.12 3.16 5 3.39 5 3.69v16.62c0 .3.12.53.25.66l.06.06L15.42 11l-.11-.11L5.31 2.97l-.06.06zM18.8 9.35l-3.32-1.9-3.41 3.43 3.42 3.42 3.31-1.89c.94-.54.94-1.42 0-1.96l.01-.1zM15.41 12.87L5.33 22.95c.16.17.43.2.74.02l12.72-7.27-3.38-2.83zM15.41 11.13L18.79 8.3 6.07 1.03c-.31-.18-.58-.15-.74.02l10.08 10.08z" />
                 </svg>
                 <div className="text-left">

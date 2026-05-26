@@ -100,16 +100,16 @@ export default async function TournamentDetailPage({ params }: Props) {
 
       <div className="container mx-auto px-4 py-8 max-w-5xl">
 
-        {/* Navegación */}
-        {/* <div className="mb-8">
+        {/* Navegación al buscador/mapa de torneos */}
+        <div className="mb-6">
           <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-sm text-[#737373] hover:text-[#1F1F1F] transition-colors"
+            href="/torneos"
+            className="inline-flex items-center gap-2 text-sm font-bold text-[#737373] hover:text-[#1F1F1F] transition-colors group"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Volver a la portada
+            <ArrowLeft className="w-4 h-4 text-[#737373] group-hover:-translate-x-0.5 transition-transform" />
+            Ver el mapa de los torneos
           </Link>
-        </div> */}
+        </div>
 
         {/* Banner de Aviso de App Móvil */}
         <AppPromoBanner shortId={shortId} />
