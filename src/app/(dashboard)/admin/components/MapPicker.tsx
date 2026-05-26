@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import Script from "next/script";
 import { toast } from "sonner";
 import { cleanAddress } from "@/lib/utils/helpers";
 
@@ -23,41 +24,24 @@ export function MapPicker({
 }: MapPickerProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
+  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(() => {
+    return typeof window !== "undefined" && !!(window as unknown as { google?: { maps?: { Map?: unknown } } }).google?.maps?.Map;
+  });
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
 
-  // Load Google Maps Script Dynamically
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const initMap = () => {
-      setGoogleMapsLoaded(true);
+  // Polling mechanism to ensure google.maps.Map constructor is loaded before initializing
+  const handleScriptReady = () => {
+    const checkLoaded = () => {
+      const win = window as unknown as { google?: { maps?: { Map?: unknown } } };
+      if (win.google?.maps?.Map) {
+        setGoogleMapsLoaded(true);
+      } else {
+        setTimeout(checkLoaded, 50);
+      }
     };
-
-    if (typeof window !== "undefined" && (window as unknown as { google?: typeof google }).google?.maps) {
-      initMap();
-      return;
-    }
-
-    const existingScript = document.getElementById("google-maps-script");
-    if (existingScript) {
-      existingScript.addEventListener("load", initMap);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.id = "google-maps-script";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.addEventListener("load", initMap);
-    document.head.appendChild(script);
-
-    return () => {
-      script.removeEventListener("load", initMap);
-    };
-  }, []);
+    checkLoaded();
+  };
 
   // Initialize Map and Places Autocomplete
   useEffect(() => {
@@ -67,8 +51,8 @@ export function MapPicker({
 
     // Default coordinates: use current coords if available, otherwise Gipuzkoa center
     const hasLocation = latitude !== null && longitude !== null;
-    const defaultCoords = hasLocation 
-      ? { lat: latitude as number, lng: longitude as number } 
+    const defaultCoords = hasLocation
+      ? { lat: latitude as number, lng: longitude as number }
       : { lat: 43.15, lng: -2.17 };
 
     const initializedMap = new google.maps.Map(mapRef.current, {
@@ -113,7 +97,7 @@ export function MapPicker({
       const lat = place.geometry.location.lat();
       const lng = place.geometry.location.lng();
       onLocationChange(lat, lng);
-      
+
       const rawAddr = place.formatted_address || place.name || "";
       onAddressChange(cleanAddress(rawAddr));
 
@@ -230,9 +214,16 @@ export function MapPicker({
         Busca la dirección en el buscador o haz clic directamente en el mapa para colocar el marcador.
       </p>
 
+      {/* Google Maps Script */}
+      <Script
+        id="google-maps-script"
+        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&loading=async`}
+        onReady={handleScriptReady}
+      />
+
       {/* Dynamic Google Map */}
-      <div 
-        ref={mapRef} 
+      <div
+        ref={mapRef}
         className="w-full h-60 rounded-xl border border-[#EAEAEA] mt-2 bg-neutral-100 flex items-center justify-center text-xs text-neutral-400 font-semibold"
       >
         {!googleMapsLoaded ? "Cargando mapa interactivo..." : ""}
