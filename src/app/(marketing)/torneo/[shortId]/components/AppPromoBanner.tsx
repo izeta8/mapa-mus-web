@@ -1,4 +1,9 @@
+"use client";
+
 import { Info, Download } from 'lucide-react';
+import { openInApp } from "@/lib/utils/open-in-app";
+
+const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.izeta.mapamus";
 
 interface AppPromoBannerProps {
   shortId: string;
@@ -17,14 +22,14 @@ export function AppPromoBanner({ shortId }: AppPromoBannerProps) {
         </div>
       </div>
       <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
-        <a
-          href={`mapamus://tournament/${shortId}`}
-          className="px-5 py-2.5 bg-[#33AD6A] text-white font-semibold text-sm rounded-xl hover:bg-[#288A56] transition-all text-center flex-1 sm:flex-initial shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+        <button
+          onClick={() => openInApp(shortId)}
+          className="px-5 py-2.5 bg-[#33AD6A] text-white font-semibold text-sm rounded-xl hover:bg-[#288A56] transition-all text-center flex-1 sm:flex-initial shadow-sm hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
         >
           Abrir en App
-        </a>
+        </button>
         <a
-          href="https://play.google.com/store/apps/details?id=com.izeta.mapamus"
+          href={PLAY_STORE_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="px-5 py-2.5 bg-white hover:bg-[#F7F7F7] text-[#1F1F1F] border border-[#EAEAEA] font-semibold text-sm rounded-xl transition-all text-center flex-1 sm:flex-initial flex items-center justify-center gap-1.5 shadow-sm"

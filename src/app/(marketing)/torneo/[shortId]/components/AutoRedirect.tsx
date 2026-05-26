@@ -12,6 +12,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Smartphone } from "lucide-react";
+import { openInApp } from "@/lib/utils/open-in-app";
 
 interface AutoRedirectProps {
   shortId: string;
@@ -27,16 +28,11 @@ function shouldShowModal(): boolean {
 }
 
 export function AutoRedirect({ shortId }: AutoRedirectProps) {
-  // Lazy initial state: the function runs once on the client, never on the server.
-  // This avoids calling setState inside an effect (react-hooks/set-state-in-effect).
   const [isOpen, setIsOpen] = useState(shouldShowModal);
 
   const handleOpenApp = () => {
     setIsOpen(false);
-    const fallbackUrl = encodeURIComponent(
-      window.location.href.split("#")[0] + "#no-redirect"
-    );
-    window.location.href = `intent://tournament/${shortId}#Intent;scheme=mapamus;package=com.izeta.mapamus;S.browser_fallback_url=${fallbackUrl};end;`;
+    openInApp(shortId);
   };
 
   const handleCancel = () => {
@@ -61,7 +57,7 @@ export function AutoRedirect({ shortId }: AutoRedirectProps) {
             ¿Abrir en la aplicación?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-[#737373] mt-2">
-            Se ha detectado que tienes la aplicación instalada. ¿Quieres abrir el torneo seleccionado en la app de Mapa Mus?
+            Se ha detectado que estás usando un dispositivo móvil. Para una mejor experiencia de uso, ¿quieres abrir el torneo en la app de Mapa Mus?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="mt-6 flex flex-col gap-2 sm:flex-row-reverse sm:justify-center">
