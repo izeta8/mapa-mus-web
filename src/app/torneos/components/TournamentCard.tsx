@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Tournament, Prize } from "@/types/database";
 import { SafeDate } from "@/components/ui/custom/SafeDate";
-import { Calendar, MapPin, Award, MapPinned, ExternalLink } from "lucide-react";
+import { Calendar, MapPin, Award, MapPinned, ExternalLink, Ticket } from "lucide-react";
 
 interface TournamentCardProps {
   tournament: Tournament;
@@ -49,19 +49,6 @@ export function TournamentCard({
   if (isCompact) {
     return (
       <div className="p-4 bg-white border border-[#EAEAEA] rounded-2xl shadow-sm space-y-3">
-        <div className="flex justify-between items-start gap-2">
-          <span
-            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-              statusColors[tournament.status]
-            }`}
-          >
-            {statusLabels[tournament.status]}
-          </span>
-          <span className="text-xs font-bold text-[#33AD6A] bg-[#33AD6A]/5 px-2 py-0.5 rounded-lg border border-[#33AD6A]/10">
-            {priceLabel}
-          </span>
-        </div>
-
         <h3 className="font-extrabold text-base text-[#1F1F1F] leading-tight line-clamp-1">
           {tournament.name}
         </h3>
@@ -74,6 +61,10 @@ export function TournamentCard({
           <div className="flex items-center gap-2">
             <MapPin className="w-3.5 h-3.5 text-[#33AD6A] shrink-0" />
             <span className="truncate">{tournament.location}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Ticket className="w-3.5 h-3.5 text-[#33AD6A] shrink-0" />
+            <span className="font-medium text-zinc-700">{priceLabel}</span>
           </div>
           {firstPrize && (
             <div className="flex items-center gap-2">
@@ -105,26 +96,11 @@ export function TournamentCard({
       }`}
     >
       <div className="space-y-3">
-        <div className="flex justify-between items-start gap-2">
-          <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-              statusColors[tournament.status]
-            }`}
-          >
-            {statusLabels[tournament.status]}
-          </span>
-          <span className="text-xs font-bold text-[#33AD6A] bg-[#33AD6A]/5 px-2.5 py-0.5 rounded-lg border border-[#33AD6A]/10">
-            {priceLabel}
-          </span>
-        </div>
+        <h3 className="font-extrabold text-lg text-[#1F1F1F] leading-snug">
+          {tournament.name}
+        </h3>
 
-        <div className="space-y-1">
-          <h3 className="font-extrabold text-lg text-[#1F1F1F] leading-snug">
-            {tournament.name}
-          </h3>
-        </div>
-
-        <div className="space-y-2 text-sm text-[#737373] pt-1">
+        <div className="space-y-2 text-sm text-[#737373]">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-[#33AD6A] shrink-0" />
             <SafeDate date={tournament.tournament_date} className="font-medium text-zinc-700" />
@@ -133,6 +109,11 @@ export function TournamentCard({
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4 text-[#33AD6A] shrink-0" />
             <span className="truncate text-zinc-700">{tournament.location}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Ticket className="w-4 h-4 text-[#33AD6A] shrink-0" />
+            <span className="font-medium text-zinc-700">{priceLabel}</span>
           </div>
 
           {firstPrize && (
