@@ -34,7 +34,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `el ${new Date(tournament.tournament_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`
     : '';
   const description = `¡Apúntate al torneo de Mus ${locationText} ${dateText}! Consulta premios, formato de juego y regístrate en Mapa Mus.`;
-  const posterUrl = tournament.poster_url || 'https://mapamus.site/images/og-default.png';
+
+  // Use the tournament poster if available, otherwise fall back to the site logo
+  const posterUrl = tournament.poster_url || '/logo.png';
 
   return {
     title,
@@ -51,7 +53,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         },
       ],
       type: 'website',
-      url: `http://mapamus.site/tournament/${shortId}`,
+      url: `https://mapamus.site/torneo/${shortId}`,
     },
     twitter: {
       card: 'summary_large_image',
