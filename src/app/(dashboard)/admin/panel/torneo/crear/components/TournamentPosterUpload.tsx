@@ -29,23 +29,26 @@ export function TournamentPosterUpload({
       
       <div 
         onClick={() => !isPending && posterInputRef.current?.click()}
-        className="w-64 h-80 rounded-2xl border-2 border-dashed border-neutral-300 flex flex-col items-center justify-center cursor-pointer hover:border-[#33AD6A] hover:bg-neutral-50 transition-all overflow-hidden relative group mt-1 bg-neutral-50 shadow-sm"
+        className={`rounded-2xl border-2 border-dashed border-neutral-300 hover:border-[#33AD6A] hover:bg-neutral-50 transition-all overflow-hidden relative group mt-1 bg-neutral-50 shadow-sm cursor-pointer ${
+          posterPreview ? "w-fit h-fit" : "w-64 h-80 flex flex-col items-center justify-center"
+        }`}
       >
         {posterPreview ? (
-          <>
+          <div className="relative">
             <Image 
               src={posterPreview} 
               alt="Cartel del torneo" 
-              fill
+              width={280}
+              height={360}
               unoptimized
-              className="object-cover" 
+              className="max-w-[280px] max-h-[360px] w-auto h-auto block" 
             />
             {!isPending && (
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
                 <span className="text-xs text-white font-bold uppercase">Cambiar Imagen</span>
               </div>
             )}
-          </>
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center text-neutral-400 p-6 text-center">
             <svg className="w-10 h-10 mb-3 text-neutral-400 group-hover:text-[#33AD6A] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">

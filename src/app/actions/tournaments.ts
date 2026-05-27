@@ -45,11 +45,11 @@ export async function getTournamentIdByMatchId(supabase: SupabaseClient<Database
   return match.tournament_id;
 }
 
-export async function addCouple(formData: { 
-  tournamentId: string, 
-  player1: string, 
-  player2: string, 
-  coupleNumber: number 
+export async function addCouple(formData: {
+  tournamentId: string,
+  player1: string,
+  player2: string,
+  coupleNumber: number
 }) {
   const supabase = await createClient();
 
@@ -185,12 +185,12 @@ export async function rollbackMatchWinner(matchId: string) {
 
 export async function updateTournamentStatus(tournamentId: string, status: 'ongoing') {
   const supabase = await createClient();
-  
+
   const { error } = await supabase
     .from('tournaments')
     .update({ status })
     .eq('id', tournamentId);
-      
+
   if (error) {
     console.error("Error updating tournament status:", error.message);
     throw new Error('No se pudo cambiar el estado del torneo');
@@ -422,4 +422,71 @@ export async function deleteTournament(id: string) {
 
   revalidatePath("/admin/panel");
   return { success: true };
-}
+}
+
+export async function processTournamentPoster(formData: FormData) {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Usuario no autenticado." };
+    }
+
+    const file = formData.get("file");
+    const caption = formData.get("caption");
+
+    if (!file || !(file instanceof File)) {
+      return { success: false, error: "No se ha proporcionado ningún archivo válido." };
+    }
+
+    const webhookUrl = process.env.N8N_WEBHOOK_URL;
+    if (!webhookUrl) {
+      console.error("N8N_WEBHOOK_URL is not defined in environment variables.");
+      return { success: false, error: "El servicio de procesamiento de carteles está mal configurado. Contacte con un administrador, por favor." };
+    }
+
+    const sendFormData = new FormData();
+    sendFormData.append("file", file);
+    if (caption) {
+      sendFormData.append("caption", caption as string);
+    }
+    sendFormData.append("organizer_id", user.id);
+
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      body: sendFormData,
+    });
+
+    if (!response.ok) {
+      try {
+        const errJson = await response.json();
+        return { success: false, error: errJson.error || errJson.message || "Error al procesar el cartel con el asistente de IA." };
+      } catch {
+        const errorText = await response.text();
+        console.error("n8n webhook error response:", errorText);
+        return { success: false, error: "Error al procesar el cartel con el asistente de IA." };
+      }
+    }
+
+    const json = await response.json();
+
+    if (json && json.success === false) {
+      return { success: false, error: json.error || "Ocurrió un error al procesar el cartel." };
+    }
+
+    const shortId = json?.shortId || json?.short_id || json?.data?.short_id || json?.data?.shortId;
+
+    if (!shortId) {
+      console.error("N8N webhook did not return a shortId:", json);
+      return { success: false, error: "El asistente de IA no devolvió un identificador de torneo válido." };
+    }
+
+    revalidatePath("/admin/panel");
+    return { success: true, shortId };
+  } catch (error) {
+    console.error("Error in processTournamentPoster:", error);
+    const errorMessage = error instanceof Error ? error.message : "Ocurrió un error inesperado al procesar el cartel.";
+    return { success: false, error: errorMessage };
+  }
+}
