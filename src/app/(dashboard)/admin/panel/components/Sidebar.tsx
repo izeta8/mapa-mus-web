@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building, Trophy, X, Mail, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Building, Trophy, X, Mail, ShieldAlert, ShieldCheck, Home } from "lucide-react";
 import { SignOutButton } from "./SignOutButton";
 import {
   AlertDialog,
@@ -155,6 +155,13 @@ export function Sidebar({ orgName, isVerified, isOpen, onClose }: SidebarProps) 
             </div>
           </div>
         )}
+        <Link
+          href="/"
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm font-semibold text-neutral-500 hover:bg-[#F3F4F6] hover:text-neutral-900 transition-all duration-200 text-left cursor-pointer"
+        >
+          <Home className="w-5 h-5 text-neutral-400" />
+          Ir al Inicio
+        </Link>
         <AlertDialog>
           <AlertDialogTrigger
             render={
