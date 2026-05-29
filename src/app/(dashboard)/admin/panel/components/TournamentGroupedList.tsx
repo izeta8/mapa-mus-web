@@ -9,6 +9,7 @@ import {
   Crown,
   Edit,
   Euro,
+  Info,
   MapPin,
   Users,
 } from "lucide-react";
@@ -113,20 +114,29 @@ export function TournamentGroupedList({ initialTournaments }: TournamentGroupedL
                 </span>
               </div>
               <ChevronDown
-                className={`w-4 h-4 text-zinc-400 group-hover:text-zinc-600 transition-transform duration-200 ${
-                  isOpen ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 text-zinc-400 group-hover:text-zinc-600 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
             {/* Accordion Content */}
             <div
-              className={`transition-all duration-300 ease-in-out ${
-                isOpen ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
-              }`}
+              className={`transition-all duration-300 ease-in-out ${isOpen ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+                }`}
             >
               {isOpen && (
                 <div className="mt-4">
+                  {status === "revision_pending" && (
+                    <div className="mb-5 p-4 rounded-2xl border border-amber-200 bg-amber-50/50 text-xs text-neutral-700 flex gap-3 items-start">
+                      <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <h5 className="font-bold text-amber-800">Torneos en Revisión</h5>
+                        <p className="leading-relaxed">
+                          Los torneos creados por organizadores no verificados requieren la revisión y validación de los administradores de Mapa Mus antes de ser publicados. Mientras estén en revisión, solo tú podrás verlos y gestionarlos desde este panel. Una vez validados, pasarán a &apos;Planeados&apos; y serán visibles públicamente en la web.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   {count === 0 ? (
                     <div className="py-8 border border-zinc-150 border-dashed rounded-2xl text-center text-zinc-400 text-xs bg-zinc-50/20">
                       No hay torneos en esta sección.
@@ -136,7 +146,7 @@ export function TournamentGroupedList({ initialTournaments }: TournamentGroupedL
                       {list.map((tournament) => (
                         <Link href={`/admin/panel/torneo/${tournament.short_id}`} key={tournament.id}>
                           <div className="group/card relative flex flex-col h-full bg-white border border-zinc-200 hover:border-[#33AD6A] rounded-2xl p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                            
+
                             {/* Card Header: Title & Status Badge */}
                             <div className="flex justify-between items-start gap-3 mb-4">
                               <h4 className="font-bold text-base sm:text-lg text-zinc-900 group-hover/card:text-[#33AD6A] transition-colors line-clamp-2 leading-snug">
