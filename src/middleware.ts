@@ -2,45 +2,50 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error("Missing Supabase environment variables in middleware configuration.");
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Let Next.js internals, static assets, and home page pass without checking
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.includes(".") ||
-    pathname === "/"
-  ) {
-    return NextResponse.next();
-  }
-
-  // Handle /admin root path: redirect to /admin/panel
-  if (pathname === "/admin") {
-    return NextResponse.redirect(new URL("/admin/panel", request.url));
-  }
-
-  // Only run session/DB checks on admin routes (/admin/login, /admin/onboarding, /admin/panel/*)
-  const isAdminRoute = pathname.startsWith("/admin/");
-  if (!isAdminRoute) {
-    return NextResponse.next();
-  }
-
+  // Respuesta base para almacenar cookies inyectadas por Supabase
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
+  // Helper para redirigir preservando las cookies de sesión (refrescadas por Supabase)
+  const redirect = (targetPath: string) => {
+    const redirectResponse = NextResponse.redirect(new URL(targetPath, request.url));
+    response.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, {
+        path: cookie.path,
+        domain: cookie.domain,
+        maxAge: cookie.maxAge,
+        secure: cookie.secure,
+        sameSite: cookie.sameSite,
+        expires: cookie.expires,
+        httpOnly: cookie.httpOnly,
+      });
+    });
+    return redirectResponse;
+  };
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+          cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
           response = NextResponse.next({
@@ -60,48 +65,34 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Route protection logic
+  // Caso 1: Usuario NO autenticado
   if (!user) {
-    // If not logged in and trying to access panel or onboarding, redirect to login
-    if (pathname.startsWith("/admin/panel") || pathname === "/admin/onboarding") {
-      return NextResponse.redirect(new URL("/admin/login", request.url));
+    if (pathname.startsWith("/admin/panel") || pathname === "/admin/onboarding" || pathname === "/admin") {
+      return redirect("/admin/login");
     }
     return response;
   }
 
-  // User is logged in
-  if (pathname === "/admin/login") {
-    // Check if organization exists to decide where to redirect the logged-in user
-    const { data: organizer } = await supabase
-      .from("organizers")
-      .select("id")
-      .eq("id", user.id)
-      .single();
-
-    if (organizer) {
-      return NextResponse.redirect(new URL("/admin/panel", request.url));
-    } else {
-      return NextResponse.redirect(new URL("/admin/onboarding", request.url));
-    }
-  }
-
-  // Check if organization exists for the logged in user
+  // Caso 2: Usuario SÍ autenticado
   const { data: organizer } = await supabase
     .from("organizers")
     .select("id")
     .eq("id", user.id)
     .single();
 
-  if (!organizer) {
-    // If no organization and not already on onboarding page, redirect to onboarding
-    if (pathname.startsWith("/admin/panel") && pathname !== "/admin/onboarding") {
-      return NextResponse.redirect(new URL("/admin/onboarding", request.url));
-    }
-  } else {
-    // If organization exists and on onboarding, redirect to panel
-    if (pathname === "/admin/onboarding") {
-      return NextResponse.redirect(new URL("/admin/panel", request.url));
-    }
+  // Redirección raíz /admin o login
+  if (pathname === "/admin" || pathname === "/admin/login") {
+    return redirect(organizer ? "/admin/panel" : "/admin/onboarding");
+  }
+
+  // Comprobación de panel sin perfil
+  if (pathname.startsWith("/admin/panel") && !organizer) {
+    return redirect("/admin/onboarding");
+  }
+
+  // Comprobación de onboarding con perfil
+  if (pathname === "/admin/onboarding" && organizer) {
+    return redirect("/admin/panel");
   }
 
   return response;
