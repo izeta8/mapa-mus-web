@@ -6,8 +6,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrophyIcon, MapPinIcon, CheckIcon, Loader2Icon, Undo2Icon, ChevronRightIcon } from "lucide-react";
-import { setMatchWinner, rollbackMatchWinner, advanceTournamentRound } from "@/app/actions/tournaments";
+import { setMatchWinner, rollbackMatchWinner, advanceTournamentRound, revertTournamentRound } from "@/app/actions/tournaments";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Props {
   tournament: TournamentFull;
@@ -24,13 +35,21 @@ export function MatchManagement({ tournament }: Props) {
   // Estado local para la pestaña que estamos mirando el organizador
   const [activeTab, setActiveTab] = useState(tournamentCurrentRound.toString());
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const [isReverting, setIsReverting] = useState(false);
+  const [revertDialogOpen, setRevertDialogOpen] = useState(false);
 
   // Verificar si la ronda que estamos mirando está completa
   const currentTabMatches = tournament.matches.filter(m => m.round === parseInt(activeTab));
   const isRoundComplete = currentTabMatches.length > 0 && currentTabMatches.every(m => m.winner_id !== null || m.is_bye);
 
-  // Verificar si es la ronda que está actualmente "en la TV"  const isViewingCurrentTournamentRound = parseInt(activeTab) === tournamentCurrentRound;
+  // Verificar si es la ronda que está actualmente "en la TV"
   const isViewingCurrentTournamentRound = parseInt(activeTab) === tournamentCurrentRound;
+
+  // Verificar si ya hay resultados registrados en la ronda activa o siguientes (números de ronda menores o iguales)
+  const hasSubsequentResults = tournament.matches.some(
+    m => m.round <= tournamentCurrentRound && m.winner_id !== null && !m.is_bye
+  );
+
   const handleAdvanceRound = async () => {
     const nextRound = tournamentCurrentRound - 1;
     if (nextRound < 1) {
@@ -44,8 +63,28 @@ export function MatchManagement({ tournament }: Props) {
 
     if (result.success) {
       toast.success(`Ronda ${nextRound} anunciada en TV`);
+      setActiveTab(nextRound.toString());
     } else {
       toast.error("Error: " + result.error);
+    }
+  };
+
+  const handleRevertRound = async () => {
+    const prevRound = tournamentCurrentRound + 1;
+    if (prevRound > rounds[0]) {
+      return;
+    }
+
+    setIsReverting(true);
+    const result = await revertTournamentRound(tournament.id, prevRound);
+    setIsReverting(false);
+
+    if (result.success) {
+      toast.success(`Ronda revertida a la Ronda ${prevRound}`);
+      setActiveTab(prevRound.toString());
+      setRevertDialogOpen(false);
+    } else {
+      toast.error("Error al revertir ronda: " + result.error);
     }
   };
 
@@ -69,6 +108,46 @@ export function MatchManagement({ tournament }: Props) {
           </TabsList>
 
           <div className="flex items-center gap-4">
+            {/* Botón de Retroceder Ronda con Modal */}
+            {isViewingCurrentTournamentRound && tournamentCurrentRound < rounds[0] && (
+              <AlertDialog open={revertDialogOpen} onOpenChange={setRevertDialogOpen}>
+                <AlertDialogTrigger
+                  render={
+                    <Button
+                      disabled={isReverting}
+                      variant="outline"
+                      className="border-destructive/30 text-destructive hover:bg-destructive/10 font-bold h-12 px-6 shadow-sm"
+                    >
+                      {isReverting ? <Loader2Icon className="size-5 animate-spin mr-2" /> : <Undo2Icon className="size-5 mr-2" />}
+                      Volver a Ronda {tournamentCurrentRound + 1}
+                    </Button>
+                  }
+                />
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>¿Volver a la Ronda {tournamentCurrentRound + 1}?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                      {hasSubsequentResults ? (
+                        <span>
+                          <strong className="text-destructive font-bold">¡Atención!</strong> Ya se han registrado resultados en la Ronda {tournamentCurrentRound}.
+                          Si vuelves atrás y modificas algún resultado en la Ronda {tournamentCurrentRound + 1}, se <strong className="text-foreground font-bold">anularán automáticamente</strong> los resultados de los partidos siguientes que dependan de ese cambio para mantener la coherencia del cuadro.
+                        </span>
+                      ) : (
+                        `Esto cambiará la ronda activa en la TV a la Ronda ${tournamentCurrentRound + 1} para que puedas modificar o revisar sus resultados. Los emparejamientos y resultados de otras ramas del torneo que no sean modificadas permanecerán intactos.`
+                      )}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleRevertRound} className="bg-primary text-primary-foreground">
+                      Confirmar y volver
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+
+            {/* Botón de Avanzar Ronda */}
             {isRoundComplete && isViewingCurrentTournamentRound && tournamentCurrentRound > 1 && (
               <Button
                 onClick={handleAdvanceRound}
@@ -81,7 +160,7 @@ export function MatchManagement({ tournament }: Props) {
             )}
 
             <div className="text-sm font-medium text-muted-foreground bg-muted px-4 py-2 rounded-full border">
-              TV mostrando: <span className="text-primary font-bold">Ronda {tournamentCurrentRound}</span>
+              Ronda Actual: <span className="text-primary font-bold">Ronda {tournamentCurrentRound}</span>
             </div>
           </div>
         </div>
@@ -93,7 +172,11 @@ export function MatchManagement({ tournament }: Props) {
                 .filter((m) => m.round === round)
                 .sort((a, b) => a.row_index - b.row_index)
                 .map((match) => (
-                  <MatchCard key={match.id} match={match} />
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    isActiveRound={round === tournamentCurrentRound}
+                  />
                 ))}
             </div>
           </TabsContent>
@@ -103,7 +186,7 @@ export function MatchManagement({ tournament }: Props) {
   );
 }
 
-function MatchCard({ match }: { match: MatchWithCouples }) {
+function MatchCard({ match, isActiveRound }: { match: MatchWithCouples; isActiveRound: boolean }) {
   const [isSettingWinner, setIsSettingWinner] = useState<string | null>(null);
   const [isRollingBack, setIsRollingBack] = useState(false);
 
@@ -176,7 +259,7 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
         {/* Enfrentamiento */}
         <div className="flex-1 p-6 flex items-center justify-around gap-4">
           {/* Pareja 1 */}
-          <div className={`flex flex-col items-center gap-4 flex-1 transition-all ${match.winner_id === match.couple1_id ? 'scale-105' : isCompleted ? 'opacity-40 grayscale' : ''}`}>
+          <div className={`flex flex-col items-center gap-4 flex-1 transition-all ${isCompleted && match.winner_id === match.couple1_id ? 'scale-105' : isCompleted ? 'opacity-40 grayscale' : ''}`}>
             <div className="size-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-black text-2xl">
               {match.couple1?.couple_number || '?'}
             </div>
@@ -185,22 +268,24 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
               <p className="font-bold text-xl leading-tight text-muted-foreground truncate max-w-[150px]">{match.couple1?.player2_name}</p>
             </div>
 
-            {match.winner_id === match.couple1_id ? (
+            {isCompleted && match.winner_id === match.couple1_id ? (
               <div className="flex flex-col items-center gap-2">
                 <div className="bg-emerald-500 text-white px-4 py-1 rounded-full text-sm font-black flex items-center gap-1 shadow-sm">
                   <TrophyIcon className="size-3" /> GANADOR
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-muted-foreground hover:text-destructive h-7"
-                  onClick={handleRollback}
-                  disabled={isRollingBack}
-                >
-                  <Undo2Icon className="size-3 mr-1" /> {isRollingBack ? "..." : "Deshacer"}
-                </Button>
+                {isActiveRound && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-muted-foreground hover:text-destructive h-7"
+                    onClick={handleRollback}
+                    disabled={isRollingBack}
+                  >
+                    <Undo2Icon className="size-3 mr-1" /> {isRollingBack ? "..." : "Deshacer"}
+                  </Button>
+                )}
               </div>
-            ) : !isCompleted ? (
+            ) : !isCompleted && isActiveRound ? (
               <Button
                 onClick={() => match.couple1_id && handleSetWinner(match.couple1_id)}
                 disabled={!!isSettingWinner || isRollingBack || !match.couple1_id || !match.couple2_id}
@@ -215,7 +300,7 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
           <div className="text-3xl font-black text-muted-foreground/20 italic">VS</div>
 
           {/* Pareja 2 */}
-          <div className={`flex flex-col items-center gap-4 flex-1 transition-all ${match.winner_id === match.couple2_id ? 'scale-105' : isCompleted ? 'opacity-40 grayscale' : ''}`}>
+          <div className={`flex flex-col items-center gap-4 flex-1 transition-all ${isCompleted && match.winner_id === match.couple2_id ? 'scale-105' : isCompleted ? 'opacity-40 grayscale' : ''}`}>
             <div className="size-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-black text-2xl">
               {match.couple2?.couple_number || '?'}
             </div>
@@ -224,22 +309,24 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
               <p className="font-bold text-xl leading-tight text-muted-foreground truncate max-w-[150px]">{match.couple2?.player2_name}</p>
             </div>
 
-            {match.winner_id === match.couple2_id ? (
+            {isCompleted && match.winner_id === match.couple2_id ? (
               <div className="flex flex-col items-center gap-2">
                 <div className="bg-emerald-500 text-white px-4 py-1 rounded-full text-sm font-black flex items-center gap-1 shadow-sm">
                   <TrophyIcon className="size-3" /> GANADOR
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-muted-foreground hover:text-destructive h-7"
-                  onClick={handleRollback}
-                  disabled={isRollingBack}
-                >
-                  <Undo2Icon className="size-3 mr-1" /> {isRollingBack ? "..." : "Deshacer"}
-                </Button>
+                {isActiveRound && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-muted-foreground hover:text-destructive h-7"
+                    onClick={handleRollback}
+                    disabled={isRollingBack}
+                  >
+                    <Undo2Icon className="size-3 mr-1" /> {isRollingBack ? "..." : "Deshacer"}
+                  </Button>
+                )}
               </div>
-            ) : !isCompleted ? (
+            ) : !isCompleted && isActiveRound ? (
               <Button
                 onClick={() => match.couple2_id && handleSetWinner(match.couple2_id)}
                 disabled={!!isSettingWinner || isRollingBack || !match.couple1_id || !match.couple2_id}

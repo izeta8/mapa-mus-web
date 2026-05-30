@@ -102,8 +102,8 @@ export const MatchupCard = ({match, playingMatchStyles}: MatchupCardProps) => {
   }
 
   const hasWinner = !!match.winner_id;
-  const isWinner1 = match.winner_id === match.couple1_id;
-  const isWinner2 = match.winner_id === match.couple2_id;
+  const isWinner1 = hasWinner && match.winner_id === match.couple1_id;
+  const isWinner2 = hasWinner && match.winner_id === match.couple2_id;
 
   const winnerColor = "#b6f3bb";
   const loserColor  = "#fecaca"; 

@@ -79,7 +79,7 @@ export async function generateBracket(tournamentId: string) {
         await storeGeneratedBracket(tournamentId, finishedBracket);
         
         // Update tournament status to 'ongoing' and set initial round
-        await updateTournamentStatus(tournamentId, "ongoing")
+        await updateTournamentStatus(tournamentId, "ongoing", tournamentRounds)
 
         revalidatePath(`/admin/panel/[short-id]`, 'page');
         revalidatePath(`/tv/${tournamentId}`);

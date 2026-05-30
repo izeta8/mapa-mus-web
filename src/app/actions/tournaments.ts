@@ -143,6 +143,44 @@ export async function setMatchWinner(matchId: string, winnerId: string) {
     return { success: false, error: "No autorizado para modificar este torneo." };
   }
 
+  // Verificar que el partido pertenece a la ronda activa
+  const { data: match, error: matchError } = await supabase
+    .from('matches')
+    .select('round, tournament_id')
+    .eq('id', matchId)
+    .single();
+
+  if (matchError || !match) {
+    return { success: false, error: "Partido no encontrado." };
+  }
+
+  const { data: tournament, error: tournamentError } = await supabase
+    .from('tournaments')
+    .select('current_round')
+    .eq('id', match.tournament_id)
+    .single();
+
+  if (tournamentError || !tournament) {
+    return { success: false, error: "Torneo no encontrado." };
+  }
+
+  let activeRound = tournament.current_round;
+  if (activeRound === null) {
+    const { data: maxRoundData } = await supabase
+      .from('matches')
+      .select('round')
+      .eq('tournament_id', match.tournament_id)
+      .order('round', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+      
+    activeRound = maxRoundData?.round ?? 1;
+  }
+
+  if (match.round !== activeRound) {
+    return { success: false, error: "Solo se pueden registrar resultados de la ronda activa." };
+  }
+
   const { error } = await supabase.rpc('advance_winner', {
     p_match_id: matchId,
     p_winner_id: winnerId
@@ -170,6 +208,44 @@ export async function rollbackMatchWinner(matchId: string) {
     return { success: false, error: "No autorizado para modificar este torneo." };
   }
 
+  // Verificar que el partido pertenece a la ronda activa
+  const { data: match, error: matchError } = await supabase
+    .from('matches')
+    .select('round, tournament_id')
+    .eq('id', matchId)
+    .single();
+
+  if (matchError || !match) {
+    return { success: false, error: "Partido no encontrado." };
+  }
+
+  const { data: tournament, error: tournamentError } = await supabase
+    .from('tournaments')
+    .select('current_round')
+    .eq('id', match.tournament_id)
+    .single();
+
+  if (tournamentError || !tournament) {
+    return { success: false, error: "Torneo no encontrado." };
+  }
+
+  let activeRound = tournament.current_round;
+  if (activeRound === null) {
+    const { data: maxRoundData } = await supabase
+      .from('matches')
+      .select('round')
+      .eq('tournament_id', match.tournament_id)
+      .order('round', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+      
+    activeRound = maxRoundData?.round ?? 1;
+  }
+
+  if (match.round !== activeRound) {
+    return { success: false, error: "Solo se pueden deshacer resultados de la ronda activa." };
+  }
+
   const { error } = await supabase.rpc('rollback_winner', {
     p_match_id: matchId
   });
@@ -183,12 +259,17 @@ export async function rollbackMatchWinner(matchId: string) {
   return { success: true };
 }
 
-export async function updateTournamentStatus(tournamentId: string, status: 'ongoing') {
+export async function updateTournamentStatus(tournamentId: string, status: 'ongoing', currentRound?: number) {
   const supabase = await createClient();
+
+  const payload: { status: 'ongoing'; current_round?: number } = { status };
+  if (currentRound !== undefined) {
+    payload.current_round = currentRound;
+  }
 
   const { error } = await supabase
     .from('tournaments')
-    .update({ status })
+    .update(payload)
     .eq('id', tournamentId);
 
   if (error) {
@@ -213,6 +294,33 @@ export async function advanceTournamentRound(tournamentId: string, round: number
   if (error) {
     console.error("Error advancing round:", error);
     return { success: false, error: "No se pudo avanzar de ronda. Inténtalo de nuevo." };
+  }
+
+  revalidatePath(`/admin/panel/[short-id]`, 'page');
+  return { success: true };
+}
+
+export async function revertTournamentRound(tournamentId: string, round: number) {
+  const supabase = await createClient();
+
+  const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No autorizado para modificar este torneo." };
+  }
+
+  // Cambiar el puntero de ronda activa del torneo sin borrar datos en cascada,
+  // ya que la base de datos (con las funciones advance_winner y rollback_winner)
+  // ya propaga y limpia los cambios de parejas de forma selectiva cuando se modifica
+  // el resultado de un partido específico en la ronda previa, conservando intactos
+  // los cruces y resultados de las ramas que no se vieron afectadas.
+  const { error } = await supabase
+    .from('tournaments')
+    .update({ current_round: round })
+    .eq('id', tournamentId);
+
+  if (error) {
+    console.error("Error reverting round:", error);
+    return { success: false, error: "No se pudo volver a la ronda anterior. Inténtalo de nuevo." };
   }
 
   revalidatePath(`/admin/panel/[short-id]`, 'page');
