@@ -53,7 +53,7 @@ export async function storeGeneratedBracket(tournamentId: string, bracket: Match
     }
 }
 
-export async function generateBracket(tournamentId: string) {
+export async function generateBracket(tournamentId: string, prizesCount?: number) {
     try {
         const supabase = await createClient();
         const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
@@ -69,6 +69,31 @@ export async function generateBracket(tournamentId: string) {
         // Create each match of the bracket (just the placeholder without pairing)
         const matchesToInsert: MatchInsert[] = []
         buildMatchesTree(null, 1, 1, tournamentRounds, matchesToInsert, tournamentId);
+
+        // If consolation matches (such as 3rd vs 4th place) are requested
+        // and the tournament has at least semi-finals (tournamentRounds >= 2)
+        if (prizesCount !== undefined && prizesCount >= 3 && tournamentRounds >= 2) {
+            const consolationMatchId = crypto.randomUUID();
+            const consolationMatch: MatchInsert = {
+                id: consolationMatchId,
+                tournament_id: tournamentId,
+                round: 1,
+                row_index: 2, // 1 is for the main final
+                is_bye: false,
+                is_consolation: true,
+                next_match_id: null,
+                loser_match_id: null,
+                table_number: null
+            };
+            matchesToInsert.push(consolationMatch);
+
+            // Find the two semi-finals (those in round 2)
+            const semiFinals = matchesToInsert.filter(m => m.round === 2);
+            semiFinals.forEach(sf => {
+                sf.loser_match_id = consolationMatchId;
+            });
+        }
+
         matchesToInsert.sort((a, b) => (a.round ?? 0) - (b.round ?? 0));
 
         // Shuffle couples array and asign to the matches.

@@ -112,20 +112,52 @@ export const MatchupCard = ({match, playingMatchStyles}: MatchupCardProps) => {
     background: `linear-gradient(to right, ${isWinner1 ? winnerColor : loserColor} 50%, ${isWinner2 ? winnerColor : loserColor} 50%)`
   } : {};
 
+  // Badge calculations for classification matches in Round 1
+  const isRound1 = match.round === 1;
+  let badgeText = "";
+  let badgeStyles = "";
+  let cardBorderClass = "border-black";
+
+  if (isRound1) {
+    if (!match.is_consolation) {
+      badgeText = "🏆 GRAN FINAL (1º/2º)";
+      badgeStyles = "bg-amber-100 text-amber-800 border-amber-300";
+      cardBorderClass = "border-amber-500 shadow-lg shadow-amber-500/10";
+    } else {
+      const rowIndex = match.row_index ?? 2;
+      if (rowIndex === 2) {
+        badgeText = "🥉 3er y 4º PUESTO";
+        badgeStyles = "bg-zinc-100 text-zinc-700 border-zinc-300";
+        cardBorderClass = "border-zinc-400 shadow-sm";
+      } else {
+        badgeText = `🏅 ${2 * rowIndex - 1}º y ${2 * rowIndex}º PUESTO`;
+        badgeStyles = "bg-zinc-100 text-zinc-600 border-zinc-200";
+        cardBorderClass = "border-zinc-300 shadow-sm";
+      }
+    }
+  }
+
   return (
-    <div
-      className={`flex flex-col items-center justify-center border-2 border-black bg-white shadow-md aspect-3/2 transition-all duration-500 ${playingMatchStyles.container}`}
-      style={splitBackground}
-    >
-      <div className={`font-bold ${hasWinner ? 'text-zinc-700' : 'text-zinc-400'} mb-1 ${playingMatchStyles.mesa}`}>MESA {match.table_number}</div>
-      <div className="grid grid-cols-3 text-center items-center gap-3">
-        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero} transition-transform`}>
-          {match.couple1?.couple_number}
+    <div className="flex flex-col items-center gap-3">
+      {isRound1 && badgeText && (
+        <span className={`px-3 py-1 rounded-full border font-black uppercase tracking-wide text-center shrink-0 ${badgeStyles} ${playingMatchStyles.badge}`}>
+          {badgeText}
         </span>
-        <span className={`font-bold  ${playingMatchStyles.vs} ${hasWinner ? 'text-zinc-600' : 'text-zinc-300'} `}>vs</span>
-        <span className={`font-black text-zinc-900 ${playingMatchStyles.numero} transition-transform`}>
-          {match.couple2?.couple_number}
-        </span>
+      )}
+      <div
+        className={`flex flex-col items-center justify-center border-2 ${cardBorderClass} bg-white shadow-md aspect-3/2 transition-all duration-500 ${playingMatchStyles.container}`}
+        style={splitBackground}
+      >
+        <div className={`font-bold ${hasWinner ? 'text-zinc-700' : 'text-zinc-400'} mb-1 ${playingMatchStyles.mesa}`}>MESA {match.table_number}</div>
+        <div className="grid grid-cols-3 text-center items-center gap-3">
+          <span className={`font-black text-zinc-900 ${playingMatchStyles.numero} transition-transform`}>
+            {match.couple1?.couple_number}
+          </span>
+          <span className={`font-bold  ${playingMatchStyles.vs} ${hasWinner ? 'text-zinc-600' : 'text-zinc-300'} `}>vs</span>
+          <span className={`font-black text-zinc-900 ${playingMatchStyles.numero} transition-transform`}>
+            {match.couple2?.couple_number}
+          </span>
+        </div>
       </div>
     </div>
   )

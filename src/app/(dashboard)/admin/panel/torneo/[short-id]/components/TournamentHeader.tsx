@@ -67,6 +67,7 @@ export function TournamentHeader({ tournament, shortId }: Props) {
           <StartTournamentButton 
             tournamentId={tournament.id} 
             couplesCount={tournament.couples.length} 
+            prizes={tournament.prizes}
           />
         )}
       </div>

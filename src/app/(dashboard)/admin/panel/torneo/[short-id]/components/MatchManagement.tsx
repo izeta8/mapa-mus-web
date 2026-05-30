@@ -165,22 +165,53 @@ export function MatchManagement({ tournament }: Props) {
           </div>
         </div>
 
-        {rounds.map((round) => (
-          <TabsContent key={round} value={round.toString()} className="mt-0">
-            <div className="grid grid-cols-1 gap-4">
-              {tournament.matches
-                .filter((m) => m.round === round)
-                .sort((a, b) => a.row_index - b.row_index)
-                .map((match) => (
-                  <MatchCard
-                    key={match.id}
-                    match={match}
-                    isActiveRound={round === tournamentCurrentRound}
-                  />
-                ))}
-            </div>
-          </TabsContent>
-        ))}
+        {rounds.map((round) => {
+          const roundMatches = tournament.matches.filter((m) => m.round === round);
+          const mainMatches = roundMatches.filter((m) => !m.is_consolation).sort((a, b) => a.row_index - b.row_index);
+          const consolationMatches = roundMatches.filter((m) => m.is_consolation).sort((a, b) => a.row_index - b.row_index);
+
+          return (
+            <TabsContent key={round} value={round.toString()} className="mt-0">
+              <div className="flex flex-col gap-8">
+                {mainMatches.length > 0 && (
+                  <div className="flex flex-col gap-4">
+                    {consolationMatches.length > 0 && (
+                      <h3 className="text-lg font-black text-foreground/80 flex items-center gap-2 px-1">
+                        🏆 Gran Final
+                      </h3>
+                    )}
+                    <div className="grid grid-cols-1 gap-4">
+                      {mainMatches.map((match) => (
+                        <MatchCard 
+                          key={match.id} 
+                          match={match} 
+                          isActiveRound={round === tournamentCurrentRound}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {consolationMatches.length > 0 && (
+                  <div className="flex flex-col gap-4">
+                    <h3 className="text-lg font-black text-foreground/80 flex items-center gap-2 px-1 border-t pt-6 border-dashed border-muted-foreground/20">
+                      🥉 3er y 4º Puesto
+                    </h3>
+                    <div className="grid grid-cols-1 gap-4">
+                      {consolationMatches.map((match) => (
+                        <MatchCard 
+                          key={match.id} 
+                          match={match} 
+                          isActiveRound={round === tournamentCurrentRound}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          );
+        })}
       </Tabs>
     </div>
   );

@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -56,6 +56,8 @@ export type Database = {
           created_at: string
           id: string
           is_bye: boolean
+          is_consolation: boolean
+          loser_match_id: string | null
           next_match_id: string | null
           round: number
           row_index: number
@@ -71,6 +73,8 @@ export type Database = {
           created_at?: string
           id?: string
           is_bye?: boolean
+          is_consolation?: boolean
+          loser_match_id?: string | null
           next_match_id?: string | null
           round: number
           row_index: number
@@ -86,6 +90,8 @@ export type Database = {
           created_at?: string
           id?: string
           is_bye?: boolean
+          is_consolation?: boolean
+          loser_match_id?: string | null
           next_match_id?: string | null
           round?: number
           row_index?: number
@@ -108,6 +114,13 @@ export type Database = {
             columns: ["couple2_id"]
             isOneToOne: false
             referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_loser_match_id_fkey"
+            columns: ["loser_match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
             referencedColumns: ["id"]
           },
           {

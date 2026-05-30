@@ -39,7 +39,8 @@ export const buildMatchesTree = (parentId: string | null, currentLevel: number, 
         round: currentLevel,
         row_index: rowIndex,
         tournament_id: tournament_id,
-        is_bye: false
+        is_bye: false,
+        is_consolation: false
     };
 
     matchesArray.push(match);
