@@ -5,12 +5,14 @@ import TVBracketView from "./TVBracketView";
 import TVHeader from "./TVHeader";
 import TVMatchupView from "./TVMatchupView";
 import { useState } from "react";
+import { useTournamentRealtime } from "../hooks/use-tournament-realtime";
 
 interface Props {
   tournament: TournamentFull
 }
 
-export default function TVTournamentPage({ tournament }: Props) {
+export default function TVTournamentPage({ tournament: initialTournament }: Props) {
+  const { tournament } = useTournamentRealtime(initialTournament);
 
   const matches = tournament.matches;
   const inscribedCouples = tournament.couples.length;
@@ -20,6 +22,16 @@ export default function TVTournamentPage({ tournament }: Props) {
   const [viewMode, setViewMode] = useState<ViewMode>("matchup");
   // const [viewMode, setViewMode] = useState<ViewMode>(shouldShowMatchupView ? "matchup" : "bracket");
   const isBracketCreated = matches && matches.length > 0;
+
+  // Calcular parejas vivas
+  const eliminatedCoupleIds = new Set<string>();
+  tournament.matches?.forEach(m => {
+    if (m.winner_id && m.couple1_id && m.couple2_id) {
+      const loserId = m.winner_id === m.couple1_id ? m.couple2_id : m.couple1_id;
+      eliminatedCoupleIds.add(loserId);
+    }
+  });
+  const aliveCouples = inscribedCouples - eliminatedCoupleIds.size;
   
   return (
     <div className="h-screen bg-zinc-50 text-black p-4 flex flex-col ">
@@ -29,6 +41,7 @@ export default function TVTournamentPage({ tournament }: Props) {
         viewMode={viewMode}
         setViewMode={setViewMode} 
         inscribedCouples={inscribedCouples}
+        aliveCouples={aliveCouples}
         isBracketCreated={isBracketCreated}
       />
 

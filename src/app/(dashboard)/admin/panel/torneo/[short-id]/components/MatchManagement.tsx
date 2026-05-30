@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { TournamentFull, MatchWithCouples } from "@/types/database";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrophyIcon, MapPinIcon, CheckIcon, Loader2Icon, Undo2Icon, ChevronRightIcon } from "lucide-react";
-import { updateMatchTable, setMatchWinner, rollbackMatchWinner, advanceTournamentRound } from "@/app/actions/tournaments";
+import { setMatchWinner, rollbackMatchWinner, advanceTournamentRound } from "@/app/actions/tournaments";
 import { toast } from "sonner";
 
 interface Props {
@@ -15,13 +14,13 @@ interface Props {
 }
 
 export function MatchManagement({ tournament }: Props) {
-  
+
   // Obtener todas las rondas únicas de los partidos
   const rounds = Array.from(new Set(tournament.matches.map(m => m.round))).sort((a, b) => b - a);
-  
+
   // La ronda del torneo que manda (lo que ve la TV)
   const tournamentCurrentRound = tournament.current_round || rounds[0] || 1;
-  
+
   // Estado local para la pestaña que estamos mirando el organizador
   const [activeTab, setActiveTab] = useState(tournamentCurrentRound.toString());
   const [isAdvancing, setIsAdvancing] = useState(false);
@@ -56,8 +55,8 @@ export function MatchManagement({ tournament }: Props) {
         <div className="flex items-center justify-between mb-6">
           <TabsList className="bg-muted/50 p-1 h-12">
             {rounds.map((round) => (
-              <TabsTrigger 
-                key={round} 
+              <TabsTrigger
+                key={round}
                 value={round.toString()}
                 className="px-6 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm flex items-center gap-2"
               >
@@ -68,22 +67,22 @@ export function MatchManagement({ tournament }: Props) {
               </TabsTrigger>
             ))}
           </TabsList>
-          
+
           <div className="flex items-center gap-4">
-             {isRoundComplete && isViewingCurrentTournamentRound && tournamentCurrentRound > 1 && (
-               <Button 
-                onClick={handleAdvanceRound} 
+            {isRoundComplete && isViewingCurrentTournamentRound && tournamentCurrentRound > 1 && (
+              <Button
+                onClick={handleAdvanceRound}
                 disabled={isAdvancing}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 px-6 shadow-lg animate-in zoom-in-95 duration-300"
-               >
-                 {isAdvancing ? <Loader2Icon className="size-5 animate-spin mr-2" /> : <ChevronRightIcon className="size-5 mr-2" />}
-                 Anunciar Ronda {tournamentCurrentRound - 1} en TV
-               </Button>
-             )}
-             
-             <div className="text-sm font-medium text-muted-foreground bg-muted px-4 py-2 rounded-full border">
-                TV mostrando: <span className="text-primary font-bold">Ronda {tournamentCurrentRound}</span>
-             </div>
+              >
+                {isAdvancing ? <Loader2Icon className="size-5 animate-spin mr-2" /> : <ChevronRightIcon className="size-5 mr-2" />}
+                Anunciar Ronda {tournamentCurrentRound - 1} en TV
+              </Button>
+            )}
+
+            <div className="text-sm font-medium text-muted-foreground bg-muted px-4 py-2 rounded-full border">
+              TV mostrando: <span className="text-primary font-bold">Ronda {tournamentCurrentRound}</span>
+            </div>
           </div>
         </div>
 
@@ -178,22 +177,22 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
         <div className="flex-1 p-6 flex items-center justify-around gap-4">
           {/* Pareja 1 */}
           <div className={`flex flex-col items-center gap-4 flex-1 transition-all ${match.winner_id === match.couple1_id ? 'scale-105' : isCompleted ? 'opacity-40 grayscale' : ''}`}>
-             <div className="size-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-black text-2xl">
+            <div className="size-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-black text-2xl">
               {match.couple1?.couple_number || '?'}
             </div>
             <div className="text-center">
               <p className="font-bold text-xl leading-tight truncate max-w-[150px]">{match.couple1?.player1_name}</p>
               <p className="font-bold text-xl leading-tight text-muted-foreground truncate max-w-[150px]">{match.couple1?.player2_name}</p>
             </div>
-            
+
             {match.winner_id === match.couple1_id ? (
               <div className="flex flex-col items-center gap-2">
                 <div className="bg-emerald-500 text-white px-4 py-1 rounded-full text-sm font-black flex items-center gap-1 shadow-sm">
                   <TrophyIcon className="size-3" /> GANADOR
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   className="text-xs text-muted-foreground hover:text-destructive h-7"
                   onClick={handleRollback}
                   disabled={isRollingBack}
@@ -202,7 +201,7 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
                 </Button>
               </div>
             ) : !isCompleted ? (
-              <Button 
+              <Button
                 onClick={() => match.couple1_id && handleSetWinner(match.couple1_id)}
                 disabled={!!isSettingWinner || isRollingBack || !match.couple1_id || !match.couple2_id}
                 className="w-full font-bold h-10"
@@ -217,7 +216,7 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
 
           {/* Pareja 2 */}
           <div className={`flex flex-col items-center gap-4 flex-1 transition-all ${match.winner_id === match.couple2_id ? 'scale-105' : isCompleted ? 'opacity-40 grayscale' : ''}`}>
-             <div className="size-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-black text-2xl">
+            <div className="size-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-black text-2xl">
               {match.couple2?.couple_number || '?'}
             </div>
             <div className="text-center">
@@ -230,9 +229,9 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
                 <div className="bg-emerald-500 text-white px-4 py-1 rounded-full text-sm font-black flex items-center gap-1 shadow-sm">
                   <TrophyIcon className="size-3" /> GANADOR
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   className="text-xs text-muted-foreground hover:text-destructive h-7"
                   onClick={handleRollback}
                   disabled={isRollingBack}
@@ -241,7 +240,7 @@ function MatchCard({ match }: { match: MatchWithCouples }) {
                 </Button>
               </div>
             ) : !isCompleted ? (
-              <Button 
+              <Button
                 onClick={() => match.couple2_id && handleSetWinner(match.couple2_id)}
                 disabled={!!isSettingWinner || isRollingBack || !match.couple1_id || !match.couple2_id}
                 className="w-full font-bold h-10"

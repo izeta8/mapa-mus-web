@@ -110,5 +110,15 @@ export const coupleAsignation = (matchesToInsert: MatchInsert[], tournamentRound
 
     });
 
+    // Asignar números de mesa para todas las rondas intermedias/finales (1 a tournamentRounds - 1)
+    for (let r = 1; r < tournamentRounds; r++) {
+        const roundMatches = matchesToInsert.filter(m => m.round === r);
+        // Ordenar por row_index para garantizar asignación determinista
+        roundMatches.sort((a, b) => (a.row_index ?? 0) - (b.row_index ?? 0));
+        roundMatches.forEach((match, index) => {
+            match.table_number = (index + 1).toString();
+        });
+    }
+
     return matchesToInsert;
 }

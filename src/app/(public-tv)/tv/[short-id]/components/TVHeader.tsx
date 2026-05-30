@@ -7,6 +7,7 @@ interface TVHeaderProps {
   viewMode: ViewMode;
   setViewMode: (viewMode: ViewMode) => void;
   inscribedCouples: number;
+  aliveCouples: number;
   isBracketCreated: boolean;
 }
 
@@ -16,7 +17,7 @@ interface TVModeSelectorProps {
 }
 
 
-export default function TVHeader({tournamentName, viewMode, setViewMode, inscribedCouples, isBracketCreated}: TVHeaderProps) {
+export default function TVHeader({tournamentName, viewMode, setViewMode, inscribedCouples, aliveCouples, isBracketCreated}: TVHeaderProps) {
 
   return (
     <header className="flex justify-between items-center shrink-0 mb-4">
@@ -25,8 +26,12 @@ export default function TVHeader({tournamentName, viewMode, setViewMode, inscrib
             <h1 className="text-3xl font-black tracking-tight">{tournamentName}</h1>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-zinc-500">TOTAL PAREJAS</span>
-            <span className="text-2xl font-black text-zinc-700">{inscribedCouples}</span>
+            <span className="text-sm font-bold text-zinc-500">
+              {isBracketCreated ? "PAREJAS VIVAS" : "TOTAL PAREJAS"}
+            </span>
+            <span className="text-2xl font-black text-zinc-700">
+              {isBracketCreated ? `${aliveCouples}/${inscribedCouples}` : inscribedCouples}
+            </span>
           </div>
         </div>
      

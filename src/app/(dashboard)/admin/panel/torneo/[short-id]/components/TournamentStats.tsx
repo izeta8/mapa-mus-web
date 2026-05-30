@@ -11,6 +11,16 @@ interface Props {
 export function TournamentStats({ tournament, shortId }: Props) {
 
   const actualCouplesCount = tournament.couples?.length || 0;
+
+  // Calcular parejas vivas
+  const eliminatedCoupleIds = new Set<string>();
+  tournament.matches?.forEach(m => {
+    if (m.winner_id && m.couple1_id && m.couple2_id) {
+      const loserId = m.winner_id === m.couple1_id ? m.couple2_id : m.couple1_id;
+      eliminatedCoupleIds.add(loserId);
+    }
+  });
+  const aliveCouplesCount = actualCouplesCount - eliminatedCoupleIds.size;
   
   // Calcular progreso de la ronda actual
   const currentRoundMatches = tournament.matches?.filter(m => m.round === tournament.current_round && !m.is_bye) || [];
@@ -29,8 +39,12 @@ export function TournamentStats({ tournament, shortId }: Props) {
         </CardHeader>
         <CardContent className="px-4 pb-4">
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black">{actualCouplesCount}</span>
-            <span className="text-xs text-muted-foreground font-medium">Parejas</span>
+            <span className="text-3xl font-black">
+              {isOngoing ? `${aliveCouplesCount}/${actualCouplesCount}` : actualCouplesCount}
+            </span>
+            <span className="text-xs text-muted-foreground font-medium">
+              {isOngoing ? "Parejas vivas" : "Parejas"}
+            </span>
           </div>
         </CardContent>
       </Card>
