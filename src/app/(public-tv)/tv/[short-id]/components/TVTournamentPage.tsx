@@ -1,6 +1,6 @@
 "use client"
 
-import { MatchWithCouples, ViewMode, TournamentFull } from "@/types/database";
+import { ViewMode, TournamentFull } from "@/types/database";
 import TVBracketView from "./TVBracketView";
 import TVHeader from "./TVHeader";
 import TVMatchupView from "./TVMatchupView";
@@ -18,7 +18,6 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
   const inscribedCouples = tournament.couples.length;
   const tournamentName = tournament.name;
 
-  const shouldShowMatchupView = matches.length >= 32;
   const [viewMode, setViewMode] = useState<ViewMode>("matchup");
   // const [viewMode, setViewMode] = useState<ViewMode>(shouldShowMatchupView ? "matchup" : "bracket");
   const isBracketCreated = matches && matches.length > 0;
@@ -55,9 +54,12 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
           {viewMode === "matchup" ? (
             <TVMatchupView matches={matches} tournament={tournament} />
           ) : (
-            <TVBracketView matches={matches} />
+            <TVBracketView 
+              matches={matches} 
+              activeRound={tournament.current_round || Math.max(...matches.map(m => m.round), 1)} 
+            />
           )}
-      </div>
+        </div>
         </>
 
       )}

@@ -75,7 +75,18 @@ export const coupleAsignation = (matchesToInsert: MatchInsert[], tournamentRound
     const matchesWithTwoCouples = couples.length - (currentRoundSlots / 2);
     const lastRoundMatches: MatchInsert[] = matchesToInsert.filter(m => m.round === tournamentRounds);
 
-    lastRoundMatches.forEach((match, index) => {
+    // Sort lastRoundMatches by row_index to ensure deterministic order (1, 2, 3, ...)
+    lastRoundMatches.sort((a, b) => (a.row_index ?? 0) - (b.row_index ?? 0));
+
+    // Interleave left-wing and right-wing matches to distribute playing matches and BYEs symmetrically
+    const half = lastRoundMatches.length / 2;
+    const interleavedMatches: MatchInsert[] = [];
+    for (let i = 0; i < half; i++) {
+        interleavedMatches.push(lastRoundMatches[i]);
+        interleavedMatches.push(lastRoundMatches[i + half]);
+    }
+
+    interleavedMatches.forEach((match, index) => {
         if (index < matchesWithTwoCouples) {
 
             // Real match: pair two couples

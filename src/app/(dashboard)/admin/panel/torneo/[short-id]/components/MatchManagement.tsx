@@ -167,8 +167,20 @@ export function MatchManagement({ tournament }: Props) {
 
         {rounds.map((round) => {
           const roundMatches = tournament.matches.filter((m) => m.round === round);
-          const mainMatches = roundMatches.filter((m) => !m.is_consolation).sort((a, b) => a.row_index - b.row_index);
-          const consolationMatches = roundMatches.filter((m) => m.is_consolation).sort((a, b) => a.row_index - b.row_index);
+          const sortMatches = (a: MatchWithCouples, b: MatchWithCouples) => {
+            if (a.is_bye !== b.is_bye) {
+              return a.is_bye ? 1 : -1;
+            }
+            if (!a.is_bye && !b.is_bye) {
+              const tA = Number(a.table_number) || 999;
+              const tB = Number(b.table_number) || 999;
+              if (tA !== tB) return tA - tB;
+            }
+            return (a.row_index ?? 0) - (b.row_index ?? 0);
+          };
+
+          const mainMatches = roundMatches.filter((m) => !m.is_consolation).sort(sortMatches);
+          const consolationMatches = roundMatches.filter((m) => m.is_consolation).sort(sortMatches);
 
           return (
             <TabsContent key={round} value={round.toString()} className="mt-0">
