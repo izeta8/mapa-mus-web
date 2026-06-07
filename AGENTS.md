@@ -110,3 +110,4 @@ Antes de proponer o subir cualquier cambio de código, el agente debe verificar 
 1. Ejecutar `npm run lint` o `next lint` para detectar errores de sintaxis y reglas Next.js.
 2. Garantizar que todos los tipos de TypeScript compilen limpiamente.
 3. Asegurar que las features cumplan el objetivo funcional de forma limpia sin afectar a las ya existentes.
+4. **Proponer siempre el nombre del commit** que describa el cambio realizado de acuerdo al estándar de **Conventional Commits** al finalizar y resolver satisfactoriamente la tarea.
