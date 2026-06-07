@@ -15,6 +15,7 @@ interface CreateTournamentWizardProps {
   organizerLatitude?: number | null;
   organizerLongitude?: number | null;
   organizerContacts?: Contact[];
+  isOrganizerVerified?: boolean;
 }
 
 type Mode = "select" | "ai" | "manual";
@@ -32,6 +33,7 @@ export function CreateTournamentWizard({
   organizerLatitude = null,
   organizerLongitude = null,
   organizerContacts = [],
+  isOrganizerVerified = false,
 }: CreateTournamentWizardProps) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("select");
@@ -100,7 +102,7 @@ export function CreateTournamentWizard({
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
+ 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFileChange(e.dataTransfer.files[0]);
     }
@@ -166,6 +168,7 @@ export function CreateTournamentWizard({
           organizerLatitude={organizerLatitude}
           organizerLongitude={organizerLongitude}
           organizerContacts={organizerContacts}
+          isOrganizerVerified={isOrganizerVerified}
         />
       </div>
     );

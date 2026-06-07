@@ -12,11 +12,12 @@ export default async function NewTournamentPage() {
   let organizerLatitude: number | null = null;
   let organizerLongitude: number | null = null;
   let organizerContacts: Contact[] = [];
+  let isOrganizerVerified = false;
 
   if (user) {
     const { data: organizer } = await supabase
       .from("organizers")
-      .select("name, address, latitude, longitude, contacts")
+      .select("name, address, latitude, longitude, contacts, is_verified")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -26,6 +27,7 @@ export default async function NewTournamentPage() {
       organizerLatitude = organizer.latitude || null;
       organizerLongitude = organizer.longitude || null;
       organizerContacts = Array.isArray(organizer.contacts) ? (organizer.contacts as Contact[]) : [];
+      isOrganizerVerified = organizer.is_verified || false;
     }
   }
 
@@ -51,6 +53,7 @@ export default async function NewTournamentPage() {
         organizerLatitude={organizerLatitude}
         organizerLongitude={organizerLongitude}
         organizerContacts={organizerContacts}
+        isOrganizerVerified={isOrganizerVerified}
       />
     </div>
   );

@@ -37,6 +37,7 @@ interface TournamentFormProps {
   organizerLatitude?: number | null;
   organizerLongitude?: number | null;
   organizerContacts?: Contact[];
+  isOrganizerVerified?: boolean;
 }
 
 export function TournamentForm({
@@ -47,9 +48,11 @@ export function TournamentForm({
   organizerLatitude = null,
   organizerLongitude = null,
   organizerContacts = [],
+  isOrganizerVerified = false,
 }: TournamentFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [saveType, setSaveType] = useState<"draft" | "publish" | null>(null);
 
   // Helper to format ISO date to YYYY-MM-DDTHH:mm
   const formatDateTimeLocal = (dateStr?: string) => {
@@ -107,6 +110,7 @@ export function TournamentForm({
   const [prizes, setPrizes] = useState<Prize[]>(
     mode === "edit" ? (initialTournament?.prizes as unknown as Prize[]) || [] : []
   );
+
   const [rules, setRules] = useState<string[]>(
     mode === "edit" ? initialTournament?.rules || [] : []
   );
@@ -118,6 +122,12 @@ export function TournamentForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const isAlreadyDraft = mode === "edit" && initialTournament?.status === "revision_pending";
+    await handleSave(isAlreadyDraft);
+  };
+
+  const handleSave = async (isDraft: boolean) => {
+    setSaveType(isDraft ? "draft" : "publish");
 
     if (!name.trim() || !date || !location.trim()) {
       toast.error("Por favor, rellena todos los campos obligatorios.");
@@ -192,14 +202,15 @@ export function TournamentForm({
           prizes,
           rules,
           registrationDetails,
+          status: isDraft ? "revision_pending" : undefined,
         });
 
         if (res.success && res.shortId) {
-          toast.success("Torneo creado con éxito.");
+          toast.success(isDraft ? "Borrador guardado con éxito." : "Torneo creado con éxito.");
           router.push(`/admin/panel`);
           router.refresh();
         } else {
-          toast.error(res.error || "Ocurrió un error al crear el torneo.");
+          toast.error(res.error || "Ocurrió un error al guardar el torneo.");
         }
       } else {
         if (!initialTournament?.id) {
@@ -222,10 +233,11 @@ export function TournamentForm({
           prizes,
           rules,
           registrationDetails,
+          status: isDraft ? "revision_pending" : undefined,
         });
 
         if (res.success && res.shortId) {
-          toast.success("Torneo actualizado con éxito.");
+          toast.success(isDraft ? "Borrador guardado con éxito." : "Torneo actualizado con éxito.");
           router.push(`/admin/panel`);
           router.refresh();
         } else {
@@ -248,6 +260,9 @@ export function TournamentForm({
       }
     });
   };
+
+  const isAlreadyDraft = mode === "edit" && initialTournament?.status === "revision_pending";
+  const isPublished = mode === "edit" && initialTournament?.status !== "revision_pending";
 
   return (
     <div className="space-y-4">
@@ -396,19 +411,108 @@ export function TournamentForm({
             >
               Cancelar
             </Link>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="h-11 px-8 bg-[#33AD6A] hover:bg-[#288A56] active:scale-[0.98] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              {isPending ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : mode === "create" ? (
-                "Crear Torneo"
-              ) : (
-                "Guardar Cambios"
-              )}
-            </button>
+
+            {/* CASE 1: Tournament is already a draft (editing draft) */}
+            {isAlreadyDraft && (
+              <>
+                {isOrganizerVerified ? (
+                  <>
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleSave(true);
+                      }}
+                      className="h-11 px-6 border border-amber-200 hover:bg-amber-50/50 text-amber-700 font-semibold text-sm rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      {isPending && saveType === "draft" ? (
+                        <div className="w-5 h-5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mr-2" />
+                      ) : null}
+                      Guardar como Borrador
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleSave(false);
+                      }}
+                      className="h-11 px-8 bg-[#33AD6A] hover:bg-[#288A56] active:scale-[0.98] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      {isPending && saveType === "publish" ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      ) : (
+                        "Publicar Torneo"
+                      )}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isPending}
+                    className="h-11 px-8 bg-amber-600 hover:bg-amber-700 active:scale-[0.98] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isPending && saveType === "draft" ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                    ) : null}
+                    Guardar como Borrador
+                  </button>
+                )}
+              </>
+            )}
+
+            {/* CASE 2: Creating a new tournament (both buttons shown) */}
+            {!isAlreadyDraft && !isPublished && (
+              <>
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSave(true);
+                  }}
+                  className="h-11 px-6 border border-amber-200 hover:bg-amber-50/50 text-amber-700 font-semibold text-sm rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isPending && saveType === "draft" ? (
+                    <div className="w-5 h-5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mr-2" />
+                  ) : null}
+                  Guardar como Borrador
+                </button>
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSave(false);
+                  }}
+                  className="h-11 px-8 bg-[#33AD6A] hover:bg-[#288A56] active:scale-[0.98] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isPending && saveType === "publish" ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  ) : mode === "create" ? (
+                    "Crear Torneo"
+                  ) : (
+                    "Guardar Cambios"
+                  )}
+                </button>
+              </>
+            )}
+
+            {/* CASE 3: Editing a published tournament (only green button shown) */}
+            {isPublished && (
+              <button
+                type="submit"
+                disabled={isPending}
+                className="h-11 px-8 bg-[#33AD6A] hover:bg-[#288A56] active:scale-[0.98] text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isPending && saveType === "publish" ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                ) : (
+                  "Guardar Cambios"
+                )}
+              </button>
+            )}
           </div>
         </div>
 

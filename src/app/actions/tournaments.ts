@@ -352,8 +352,10 @@ export async function createTournament(formData: unknown) {
     return { success: false, error: "No se encontró el perfil de organizador para tu usuario." };
   }
 
-  // 2. Set tournament status based on verification
-  const status = org.is_verified ? "planned" : "revision_pending";
+  // 2. Set tournament status based on verification or explicit draft status
+  const status = data.status === "revision_pending"
+    ? "revision_pending"
+    : (org.is_verified ? "planned" : "revision_pending");
 
   // 3. Insert the tournament
   const { data: insertedData, error } = await supabase
@@ -387,19 +389,21 @@ export async function createTournament(formData: unknown) {
   }
 
   // Send Telegram notification
-  const isVerified = org.is_verified;
-  const tournamentLink = isVerified
+  const tournamentLink = status === "planned"
     ? `https://mapamus.com/torneos/${insertedData.short_id}`
     : `https://mapa-mus-mitm.vercel.app/?id=${insertedData.id}`;
+
+  const statusLabel = status === "revision_pending"
+    ? (data.status === "revision_pending" ? "🟡 Borrador / En Revisión" : "🟡 Pendiente de revisión")
+    : "🟢 Activo (Verificado)";
 
   const telegramText = `🏆 *Nuevo Torneo Creado*\n\n` +
     `*Torneo:* ${data.name}\n` +
     `*Organizador:* ${org.name || "Desconocido"}\n` +
     `*Fecha:* ${data.tournamentDate}\n` +
     `*Ubicación:* ${data.location}\n` +
-    `*Estado:* ${isVerified ? "🟢 Activo (Verificado)" : "🟡 Pendiente de revisión"}\n` +
+    `*Estado:* ${statusLabel}\n` +
     `*Enlace:* [Ver/Gestionar](${tournamentLink})`;
-
   const telegramResult = await sendTelegramNotification(telegramText);
   if (!telegramResult.success) {
     console.error("Warning: Failed to send Telegram notification for new tournament:", telegramResult.error);
@@ -423,10 +427,10 @@ export async function updateTournament(id: string, formData: unknown) {
     return { success: false, error: "Usuario no autenticado." };
   }
 
-  // Verify ownership
+  // Verify ownership and get current status
   const { data: existing, error: fetchError } = await supabase
     .from("tournaments")
-    .select("organizer_id, short_id")
+    .select("organizer_id, short_id, status")
     .eq("id", id)
     .single();
 
@@ -436,6 +440,23 @@ export async function updateTournament(id: string, formData: unknown) {
 
   if (existing.organizer_id !== user.id) {
     return { success: false, error: "No tienes permisos para editar este torneo." };
+  }
+
+  // 1. Get organization verification status
+  const { data: org } = await supabase
+    .from("organizers")
+    .select("is_verified")
+    .eq("id", user.id)
+    .single();
+
+  let targetStatus = existing.status;
+  if (data.status === "revision_pending") {
+    targetStatus = "revision_pending";
+  } else if (existing.status === "revision_pending") {
+    // If it was in revision/draft, and we do a normal save, promote to planned if verified
+    if (org?.is_verified) {
+      targetStatus = "planned";
+    }
   }
 
   // Update the tournament
@@ -449,6 +470,7 @@ export async function updateTournament(id: string, formData: unknown) {
       max_spots: data.maxSpots,
       kings_modality: data.kingsModality,
       points_modality: data.pointsModality || null,
+      status: targetStatus,
       contacts: data.contacts ?? [],
       prizes: data.prizes ?? [],
       rules: data.rules ?? [],
@@ -597,4 +619,64 @@ export async function processTournamentPoster(formData: FormData) {
     const errorMessage = error instanceof Error ? error.message : "Ocurrió un error inesperado al procesar el cartel.";
     return { success: false, error: errorMessage };
   }
+}
+
+export async function changeTournamentStatusToDraft(tournamentId: string) {
+  const supabase = await createClient();
+
+  const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No tienes permisos para modificar este torneo." };
+  }
+
+  const { error } = await supabase
+    .from("tournaments")
+    .update({ status: "revision_pending" })
+    .eq("id", tournamentId);
+
+  if (error) {
+    console.error("Error setting tournament status to draft:", error);
+    return { success: false, error: "No se pudo cambiar el estado a borrador. Inténtalo de nuevo." };
+  }
+
+  revalidatePath("/admin/panel");
+  return { success: true };
+}
+
+export async function publishTournament(tournamentId: string) {
+  const supabase = await createClient();
+
+  const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No tienes permisos para modificar este torneo." };
+  }
+
+  // Double check organizer verification status on the server
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "Usuario no autenticado." };
+  }
+
+  const { data: org } = await supabase
+    .from("organizers")
+    .select("is_verified")
+    .eq("id", user.id)
+    .single();
+
+  if (!org?.is_verified) {
+    return { success: false, error: "Tu cuenta de organizador no está verificada para publicar torneos directamente." };
+  }
+
+  const { error } = await supabase
+    .from("tournaments")
+    .update({ status: "planned" })
+    .eq("id", tournamentId);
+
+  if (error) {
+    console.error("Error publishing tournament:", error);
+    return { success: false, error: "No se pudo publicar el torneo. Inténtalo de nuevo." };
+  }
+
+  revalidatePath("/admin/panel");
+  return { success: true };
 }
