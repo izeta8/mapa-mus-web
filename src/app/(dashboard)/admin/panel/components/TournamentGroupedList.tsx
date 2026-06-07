@@ -168,6 +168,7 @@ export function TournamentGroupedList({
                               </span>
                               <TournamentActionsDropdown
                                 tournamentId={tournament.id}
+                                tournamentShortId={tournament.short_id}
                                 currentStatus={tournament.status}
                                 tournamentName={tournament.name}
                                 isOrganizerVerified={isOrganizerVerified}

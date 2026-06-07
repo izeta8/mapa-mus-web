@@ -12,7 +12,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const tournament = await getTournamentFullDataByShortId(shortId);
 
-    if (!tournament || !tournament.poster_url) {
+    if (!tournament || (tournament.status !== "planned" && tournament.status !== "ongoing")) {
+      return new Response("Not Found", { status: 404 });
+    }
+
+    if (!tournament.poster_url) {
       // Redirect to the default logo if no poster exists
       return NextResponse.redirect(new URL("/logo.png", request.url));
     }

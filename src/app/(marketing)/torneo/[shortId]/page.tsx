@@ -12,6 +12,7 @@ import { TournamentPoster } from './components/TournamentPoster';
 import { TournamentSpecsCard } from './components/TournamentSpecsCard';
 import { PrizesList } from './components/PrizesList';
 import { ContactsList } from './components/ContactsList';
+import { ShareButton } from './components/ShareButton';
 
 interface Props {
   params: Promise<{ shortId: string }>;
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { shortId } = await params;
   const tournament = await getTournamentFullDataByShortId(shortId);
 
-  if (!tournament) {
+  if (!tournament || (tournament.status !== 'planned' && tournament.status !== 'ongoing')) {
     return {
       title: 'Torneo no encontrado | Mapa Mus',
     };
@@ -68,7 +69,7 @@ export default async function TournamentDetailPage({ params }: Props) {
   const { shortId } = await params;
   const tournament = await getTournamentFullDataByShortId(shortId);
 
-  if (!tournament) {
+  if (!tournament || (tournament.status !== 'planned' && tournament.status !== 'ongoing')) {
     notFound();
   }
 

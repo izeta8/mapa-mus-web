@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Menu } from "@base-ui/react/menu";
-import { MoreVertical, Trash2, FileText, Globe } from "lucide-react";
+import { MoreVertical, Trash2, FileText, Globe, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { deleteTournament, changeTournamentStatusToDraft, publishTournament } from "@/app/actions/tournaments";
 import {
@@ -18,6 +19,7 @@ import {
 
 interface TournamentActionsDropdownProps {
   tournamentId: string;
+  tournamentShortId: string;
   currentStatus: string;
   tournamentName: string;
   isOrganizerVerified?: boolean;
@@ -25,6 +27,7 @@ interface TournamentActionsDropdownProps {
 
 export function TournamentActionsDropdown({
   tournamentId,
+  tournamentShortId,
   currentStatus,
   tournamentName,
   isOrganizerVerified = false,
@@ -82,6 +85,21 @@ export function TournamentActionsDropdown({
         <Menu.Portal>
           <Menu.Positioner side="bottom" align="end" sideOffset={4}>
             <Menu.Popup className="z-50 min-w-[160px] bg-white border border-[#EAEAEA] rounded-xl shadow-md p-1 focus:outline-none animate-in fade-in-0 zoom-in-95 duration-100">
+              {(currentStatus === "planned" || currentStatus === "ongoing") && (
+                <Menu.Item
+                  render={
+                    <Link
+                      href={`/torneo/${tournamentShortId}`}
+                      target="_blank"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-zinc-700 hover:bg-neutral-50 hover:text-zinc-900 rounded-lg cursor-pointer transition-colors outline-none focus:bg-neutral-50"
+                    />
+                  }
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
+                  Ver página pública
+                </Menu.Item>
+              )}
+
               {currentStatus !== "revision_pending" && (
                 <Menu.Item
                   onClick={handleSetDraft}

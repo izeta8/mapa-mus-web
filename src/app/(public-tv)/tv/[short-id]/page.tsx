@@ -14,7 +14,7 @@ export default async function Page({ params }: Props) {
   const { "short-id": shortId } = await params;
   const tournamentData = await getTournamentFullDataByShortId(shortId);
 
-  if (!tournamentData) {
+  if (!tournamentData || (tournamentData.status !== "planned" && tournamentData.status !== "ongoing")) {
     notFound();
   }
 
