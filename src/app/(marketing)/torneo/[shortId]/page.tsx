@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = `¡Anímate al torneo de Mus ${locationText} ${dateText}! Consulta premios, formato de juego y más en Mapa Mus.`;
 
   // Use the API proxy route to serve the poster without restrictive robots headers
-  const posterUrl = `/api/torneo/${shortId}/cartel.jpg`;
+  const posterUrl = `/api/torneo/${shortId}/cartel`;
 
   return {
     title,
