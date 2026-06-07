@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         },
       ],
       type: 'website',
-      url: `https://mapamus.site/torneo/${shortId}`,
+      url: `https://www.mapamus.site/torneo/${shortId}`,
     },
     twitter: {
       card: 'summary_large_image',

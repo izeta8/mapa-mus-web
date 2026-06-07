@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -18,20 +18,29 @@ interface AutoRedirectProps {
   shortId: string;
 }
 
-function shouldShowModal(): boolean {
+export function AutoRedirect({ shortId }: AutoRedirectProps) {
+  const [isMounted, setIsMounted] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      setIsMounted(true);
+    });
+    return () => cancelAnimationFrame(handle);
+  }, []);
+
+  if (!isMounted) return null;
+
   const isAndroid = /Android/i.test(navigator.userAgent);
   const hasNoRedirect =
     window.location.hash.includes("no-redirect") ||
     window.location.search.includes("no-redirect") ||
     sessionStorage.getItem("mapamus-no-redirect") === "true";
-  return isAndroid && !hasNoRedirect;
-}
 
-export function AutoRedirect({ shortId }: AutoRedirectProps) {
-  const [isOpen, setIsOpen] = useState(shouldShowModal);
+  const isOpen = isAndroid && !hasNoRedirect && !isDismissed;
 
   const handleOpenApp = () => {
-    setIsOpen(false);
+    setIsDismissed(true);
     openInApp(shortId);
   };
 
@@ -40,11 +49,11 @@ export function AutoRedirect({ shortId }: AutoRedirectProps) {
     if (!window.location.hash.includes("no-redirect")) {
       window.location.hash = "no-redirect";
     }
-    setIsOpen(false);
+    setIsDismissed(true);
   };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+    <AlertDialog open={isOpen} onOpenChange={(open) => { if (!open) setIsDismissed(true); }}>
       <AlertDialogContent
         size="default"
         className="bg-white border border-[#EAEAEA] rounded-2xl p-6 shadow-lg max-w-xs w-[90%] mx-auto"
