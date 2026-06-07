@@ -65,7 +65,7 @@ export function StartTournamentButton({ tournamentId, couplesCount, prizes }: Pr
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger 
+      <AlertDialogTrigger
         render={
           <Button size="lg" className="h-12 px-8 text-base font-bold bg-primary text-primary-foreground" disabled={isPending}>
             <PlayIcon data-icon="inline-start" className="size-5" />
@@ -100,7 +100,7 @@ export function StartTournamentButton({ tournamentId, couplesCount, prizes }: Pr
                       Se disputarán partidos para determinar hasta el <strong className="text-foreground font-bold">4º puesto</strong> (Gran Final y 3er/4º puesto).
                       {positionsPreview > 4 && (
                         <span className="block mt-1 text-amber-600 font-medium font-semibold">
-                          ⚠️ Los {positionsPreview - 4} premios restantes (del 5º al {positionsPreview}º) deberán asignarse de forma manual.
+                          ⚠️ Los {positionsPreview - 4} puestos restantes (del 5º al {positionsPreview}º) deberán ser gestionados manualmente.
                         </span>
                       )}
                     </span>
