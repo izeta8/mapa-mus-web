@@ -10,8 +10,8 @@ interface Props {
   tournament: TournamentFull,
 }
 
-export default function TVMatchupView({matches, tournament}: Props) {
-  
+export default function TVMatchupView({ matches, tournament }: Props) {
+
   // TV now follows the organizer's current_round
   const activeRound = tournament.current_round || Math.max(...matches.map(m => m.round), 1);
 
@@ -19,13 +19,13 @@ export default function TVMatchupView({matches, tournament}: Props) {
   const currentRoundMatches = matches.filter(m => m.round === activeRound);
 
   // Matches being played (have two couples)
-  const playingMatches = currentRoundMatches.filter(m => !m.is_bye && m.couple1 && m.couple2).sort((a,b) => Number(a.table_number) - Number(b.table_number));
-  
+  const playingMatches = currentRoundMatches.filter(m => !m.is_bye && m.couple1 && m.couple2).sort((a, b) => Number(a.table_number) - Number(b.table_number));
+
   // Couples that advance directly in THIS ROUND (are byes at this level)
   const byes = currentRoundMatches.filter(m => m.is_bye && m.couple1).sort((a, b) => Number(a.couple1?.couple_number) - Number(b.couple1?.couple_number))
 
   const [dimensions, setDimensions] = useState({ width: 1200, height: 800 });
-  
+
   useEffect(() => {
     const updateDimensions = () => {
       setDimensions({ width: window.innerWidth - 32, height: window.innerHeight - 150 });
@@ -36,15 +36,15 @@ export default function TVMatchupView({matches, tournament}: Props) {
   }, []);
 
   const playingMatchStyles = getFontSize(playingMatches.length, "partido", dimensions.width, dimensions.height * 0.65);
-  const byeMatchStyles     = getFontSize(byes.length, "bye", dimensions.width, dimensions.height);
+  const byeMatchStyles = getFontSize(byes.length, "bye", dimensions.width, dimensions.height);
 
   return (
     <div className="h-full w-full flex flex-col" style={{ display: "grid", gridTemplateRows: "65% 35%", gridTemplateColumns: "1fr", gap: "8px", padding: "8px" }}>
-      
+
       {/* PLAYING COUPLES - 70% */}
       <div className="flex flex-wrap gap-3 justify-evenly items-center content-center h-full">
         {playingMatches.map((match) => (
-          <MatchupCard 
+          <MatchupCard
             key={match.id}
             match={match}
             playingMatchStyles={playingMatchStyles}
@@ -55,12 +55,12 @@ export default function TVMatchupView({matches, tournament}: Props) {
       {/* BYES COUPLES - 30% */}
       {byes.length > 0 && (
         <div className="flex gap-4 overflow-hidden">
-          
+
           {/* BYES CONTAINER */}
           <div className="border-4 border-black bg-zinc-100 p-3 flex-1 flex flex-col">
             <div className="bg-zinc-800 text-white px-4 py-1 mb-2 shrink-0">
-              <span className="text-sm font-black">PASAN DIRECTO</span>
-              <span className="text-sm font-black text-zinc-300 italic"> ({byes.length} PAREJAS)</span>              
+              <span className="text-m font-black">PASAN DIRECTO</span>
+              <span className="text-sm font-black text-zinc-300 italic"> ({byes.length} PAREJAS)</span>
             </div>
             <div className="flex flex-wrap gap-2 overflow-hidden justify-center items-center h-full">
               {byes.map((bye) => (
@@ -73,7 +73,7 @@ export default function TVMatchupView({matches, tournament}: Props) {
               ))}
             </div>
           </div>
-            
+
           {/* QR CONTAINER */}
           <div className="w-36 shrink-0 flex flex-col items-center justify-center gap-2 border-4 border-black bg-white p-2">
             <div className="w-28 h-28 border-2 border-black flex items-center justify-center">
@@ -82,7 +82,7 @@ export default function TVMatchupView({matches, tournament}: Props) {
             <span className="text-xs font-black text-center">ESCÁNEAME</span>
             <span className="text-sm font-bold  text-zinc-500 text-center">Busca tu mesa en la app</span>
           </div>
-          
+
         </div>
       )}
 
@@ -95,7 +95,7 @@ interface MatchupCardProps {
   playingMatchStyles: MatchupCardStyles
 }
 
-export const MatchupCard = ({match, playingMatchStyles}: MatchupCardProps) => {
+export const MatchupCard = ({ match, playingMatchStyles }: MatchupCardProps) => {
 
   if (match.couple1 === null && match.couple2 === null) {
     return
@@ -106,7 +106,7 @@ export const MatchupCard = ({match, playingMatchStyles}: MatchupCardProps) => {
   const isWinner2 = hasWinner && match.winner_id === match.couple2_id;
 
   const winnerColor = "#b6f3bb";
-  const loserColor  = "#fecaca"; 
+  const loserColor = "#fecaca";
 
   const splitBackground = hasWinner ? {
     background: `linear-gradient(to right, ${isWinner1 ? winnerColor : loserColor} 50%, ${isWinner2 ? winnerColor : loserColor} 50%)`

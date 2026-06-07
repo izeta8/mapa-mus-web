@@ -5,4 +5,7 @@ export interface MatchupCardStyles {
     mesa: string;
     vs: string;
     badge: string;
+    cardWidth: number;
+    cardHeight: number;
+    baseFontSize: number;
 }
