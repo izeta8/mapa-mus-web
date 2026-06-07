@@ -1,6 +1,7 @@
 import { getOrganizerTournaments } from "@/services/tournaments";
 import Link from "next/link";
 import { TournamentGroupedList } from "./TournamentGroupedList";
+import { createClient } from "@/lib/supabase/server";
 
 export async function TournamentList({ organizerId }: { organizerId: string }) {
   const tournaments = await getOrganizerTournaments(organizerId);
@@ -23,5 +24,13 @@ export async function TournamentList({ organizerId }: { organizerId: string }) {
     );
   }
 
-  return <TournamentGroupedList initialTournaments={tournaments} />;
+  const supabase = await createClient();
+  const { data: org } = await supabase
+    .from("organizers")
+    .select("is_verified")
+    .eq("id", organizerId)
+    .single();
+  const isOrganizerVerified = org?.is_verified ?? false;
+
+  return <TournamentGroupedList initialTournaments={tournaments} isOrganizerVerified={isOrganizerVerified} />;
 }

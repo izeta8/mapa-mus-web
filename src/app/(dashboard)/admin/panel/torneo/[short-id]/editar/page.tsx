@@ -29,6 +29,15 @@ export default async function EditTournamentPage({ params }: Props) {
     redirect("/admin/panel");
   }
 
+  // Get organizer verification status
+  const { data: org } = await supabase
+    .from("organizers")
+    .select("is_verified")
+    .eq("id", user.id)
+    .single();
+
+  const isOrganizerVerified = org?.is_verified ?? false;
+
   return (
     <div className="max-w-2xl mx-auto pb-12">
       {/* Back button */}
@@ -47,6 +56,7 @@ export default async function EditTournamentPage({ params }: Props) {
       <TournamentForm
         mode="edit"
         initialTournament={tournament}
+        isOrganizerVerified={isOrganizerVerified}
       />
     </div>
   );

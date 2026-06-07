@@ -16,9 +16,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { SafeDate } from "@/components/ui/custom/SafeDate";
+import { TournamentActionsDropdown } from "./TournamentActionsDropdown";
 
 interface TournamentGroupedListProps {
   initialTournaments: Tournament[];
+  isOrganizerVerified?: boolean;
 }
 
 const STATUS_ORDER = ["revision_pending", "planned", "finished", "canceled"] as const;
@@ -45,7 +47,10 @@ const BADGE_STYLES: Record<StatusType, string> = {
   canceled: "bg-red-50 text-red-700 border-red-200",
 };
 
-export function TournamentGroupedList({ initialTournaments }: TournamentGroupedListProps) {
+export function TournamentGroupedList({
+  initialTournaments,
+  isOrganizerVerified = false,
+}: TournamentGroupedListProps) {
   // Setup accordion sections: revision_pending and planned expanded by default, others collapsed.
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     revision_pending: true,
@@ -155,11 +160,19 @@ export function TournamentGroupedList({ initialTournaments }: TournamentGroupedL
                             <h4 className="font-bold text-base sm:text-lg text-zinc-900 line-clamp-2 leading-snug">
                               {tournament.name}
                             </h4>
-                            <span
-                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 border ${BADGE_STYLES[status]}`}
-                            >
-                              {label}
-                            </span>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span
+                                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${BADGE_STYLES[status]}`}
+                              >
+                                {label}
+                              </span>
+                              <TournamentActionsDropdown
+                                tournamentId={tournament.id}
+                                currentStatus={tournament.status}
+                                tournamentName={tournament.name}
+                                isOrganizerVerified={isOrganizerVerified}
+                              />
+                            </div>
                           </div>
 
                           {/* Card Body: Details */}
