@@ -141,6 +141,8 @@ export default async function TournamentDetailPage({ params }: Props) {
               <h1 className="text-3xl md:text-4xl font-extrabold text-[#1F1F1F] tracking-tight">{tournament.name}</h1>
             </div>
 
+            <ShareButton tournamentName={tournament.name} />
+
             {/* Ficha técnica */}
             <TournamentSpecsCard
               formattedDate={formattedDate}
