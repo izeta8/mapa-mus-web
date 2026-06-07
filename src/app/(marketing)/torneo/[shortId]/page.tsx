@@ -17,7 +17,7 @@ interface Props {
   params: Promise<{ shortId: string }>;
 }
 
-// 1. Generación dinámica de Metadatos para Open Graph (Vista previa en WhatsApp, Twitter, etc.)
+// Generación dinámica de Metadatos para Open Graph (Vista previa en WhatsApp, Twitter, etc.)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { shortId } = await params;
   const tournament = await getTournamentFullDataByShortId(shortId);
@@ -28,15 +28,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `Torneo de Mus: ${tournament.name}`;
+  const title = tournament.name;
   const locationText = tournament.location ? `en ${tournament.location}` : '';
   const dateText = tournament.tournament_date
     ? `el ${new Date(tournament.tournament_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`
     : '';
-  const description = `¡Apúntate al torneo de Mus ${locationText} ${dateText}! Consulta premios, formato de juego y regístrate en Mapa Mus.`;
+  const description = `¡Anímate al torneo de Mus ${locationText} ${dateText}! Consulta premios, formato de juego y más en Mapa Mus.`;
 
-  // Use the tournament poster if available, otherwise fall back to the site logo
-  const posterUrl = tournament.poster_url || '/logo.png';
+  // Use the API proxy route to serve the poster without restrictive robots headers
+  const posterUrl = `/api/torneo/${shortId}/cartel`;
 
   return {
     title,
