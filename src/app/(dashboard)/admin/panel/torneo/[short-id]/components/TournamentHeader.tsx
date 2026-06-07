@@ -4,6 +4,7 @@ import { TvIcon, MapPinIcon, CalendarIcon, PencilIcon } from "lucide-react";
 import Link from "next/link";
 import { TournamentFull } from "@/types/database";
 import { StartTournamentButton } from "./StartTournamentButton";
+import { ResetTournamentButton } from "./ResetTournamentButton";
 import { SafeDate } from "@/components/ui/custom/SafeDate";
 
 interface Props {
@@ -77,6 +78,11 @@ export function TournamentHeader({ tournament, shortId }: Props) {
             tournamentId={tournament.id} 
             couplesCount={tournament.couples.length} 
             prizes={tournament.prizes}
+          />
+        )}
+        {isOngoing && (
+          <ResetTournamentButton 
+            tournamentId={tournament.id}
           />
         )}
       </div>

@@ -684,3 +684,67 @@ export async function publishTournament(tournamentId: string) {
   revalidatePath("/admin/panel");
   return { success: true };
 }
+
+export async function resetTournament(tournamentId: string) {
+  const supabase = await createClient();
+
+  const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No autorizado para modificar este torneo." };
+  }
+
+  // 1. Fetch tournament details to get organizer_id and short_id
+  const { data: tournament, error: fetchError } = await supabase
+    .from("tournaments")
+    .select("organizer_id, short_id")
+    .eq("id", tournamentId)
+    .single();
+
+  if (fetchError || !tournament) {
+    return { success: false, error: "No se pudo encontrar el torneo." };
+  }
+
+  if (!tournament.organizer_id) {
+    return { success: false, error: "El torneo no tiene un organizador asignado." };
+  }
+
+  // 2. Check organizer verification status to determine target status
+  const { data: org } = await supabase
+    .from("organizers")
+    .select("is_verified")
+    .eq("id", tournament.organizer_id)
+    .single();
+
+  const targetStatus = org?.is_verified ? "planned" : "revision_pending";
+
+  // 3. Delete matches
+  const { error: deleteError } = await supabase
+    .from("matches")
+    .delete()
+    .eq("tournament_id", tournamentId);
+
+  if (deleteError) {
+    console.error("Error deleting matches on reset:", deleteError);
+    return { success: false, error: "No se pudieron eliminar los enfrentamientos. Inténtalo de nuevo." };
+  }
+
+  // 4. Update tournament status to target status and clear current_round
+  const { error: updateError } = await supabase
+    .from("tournaments")
+    .update({
+      status: targetStatus,
+      current_round: null
+    })
+    .eq("id", tournamentId);
+
+  if (updateError) {
+    console.error("Error updating tournament status on reset:", updateError);
+    return { success: false, error: "No se pudo restablecer el estado del torneo. Inténtalo de nuevo." };
+  }
+
+  revalidatePath("/admin/panel");
+  revalidatePath("/admin/panel/[short-id]", "page");
+  revalidatePath(`/tv/${tournament.short_id}`);
+
+  return { success: true, message: "Sorteo deshecho con éxito. Volviendo al registro de parejas." };
+}
