@@ -370,6 +370,7 @@ export async function createTournament(formData: unknown) {
       kings_modality: data.kingsModality,
       points_modality: data.pointsModality || null,
       status: status,
+      is_test: data.isTest,
       contacts: data.contacts ?? [],
       prizes: data.prizes ?? [],
       rules: data.rules ?? [],
@@ -389,24 +390,26 @@ export async function createTournament(formData: unknown) {
   }
 
   // Send Telegram notification
-  const tournamentLink = status === "planned"
-    ? `https://mapamus.com/torneos/${insertedData.short_id}`
-    : `https://mapa-mus-mitm.vercel.app/?id=${insertedData.id}`;
+  if (!data.isTest) {
+    const tournamentLink = status === "planned"
+      ? `https://mapamus.com/torneos/${insertedData.short_id}`
+      : `https://mapa-mus-mitm.vercel.app/?id=${insertedData.id}`;
 
-  const statusLabel = status === "revision_pending"
-    ? (data.status === "revision_pending" ? "🟡 Borrador / En Revisión" : "🟡 Pendiente de revisión")
-    : "🟢 Activo (Verificado)";
+    const statusLabel = status === "revision_pending"
+      ? (data.status === "revision_pending" ? "🟡 Borrador / En Revisión" : "🟡 Pendiente de revisión")
+      : "🟢 Activo (Verificado)";
 
-  const telegramText = `🏆 *Nuevo Torneo Creado*\n\n` +
-    `*Torneo:* ${data.name}\n` +
-    `*Organizador:* ${org.name || "Desconocido"}\n` +
-    `*Fecha:* ${data.tournamentDate}\n` +
-    `*Ubicación:* ${data.location}\n` +
-    `*Estado:* ${statusLabel}\n` +
-    `*Enlace:* [Ver/Gestionar](${tournamentLink})`;
-  const telegramResult = await sendTelegramNotification(telegramText);
-  if (!telegramResult.success) {
-    console.error("Warning: Failed to send Telegram notification for new tournament:", telegramResult.error);
+    const telegramText = `🏆 *Nuevo Torneo Creado*\n\n` +
+      `*Torneo:* ${data.name}\n` +
+      `*Organizador:* ${org.name || "Desconocido"}\n` +
+      `*Fecha:* ${data.tournamentDate}\n` +
+      `*Ubicación:* ${data.location}\n` +
+      `*Estado:* ${statusLabel}\n` +
+      `*Enlace:* [Ver/Gestionar](${tournamentLink})`;
+    const telegramResult = await sendTelegramNotification(telegramText);
+    if (!telegramResult.success) {
+      console.error("Warning: Failed to send Telegram notification for new tournament:", telegramResult.error);
+    }
   }
 
   revalidatePath("/admin/panel");
@@ -471,6 +474,7 @@ export async function updateTournament(id: string, formData: unknown) {
       kings_modality: data.kingsModality,
       points_modality: data.pointsModality || null,
       status: targetStatus,
+      is_test: data.isTest,
       contacts: data.contacts ?? [],
       prizes: data.prizes ?? [],
       rules: data.rules ?? [],

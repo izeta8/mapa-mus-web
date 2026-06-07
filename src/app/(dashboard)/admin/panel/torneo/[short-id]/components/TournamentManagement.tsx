@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function TournamentManagement({ tournament }: Props) {
-  const isPlanned = tournament.status === "planned";
+  const isPlannedOrDraft = tournament.status === "planned" || tournament.status === "revision_pending";
   const isOngoing = tournament.status === "ongoing";
   
   // Ordenar parejas por número para que la lista sea predecible
@@ -25,7 +25,7 @@ export function TournamentManagement({ tournament }: Props) {
       <CardHeader className="p-8 pb-4">
         <CardTitle className="text-2xl font-bold">Gestión del Torneo</CardTitle>
         <CardDescription className="text-base">
-          {isPlanned 
+          {isPlannedOrDraft 
             ? "Gestiona los participantes antes de empezar el sorteo inicial." 
             : isOngoing 
               ? "Controla los partidos y resultados de la ronda actual."
@@ -34,7 +34,7 @@ export function TournamentManagement({ tournament }: Props) {
       </CardHeader>
       
       <CardContent className="p-8 pt-4 flex-1 flex flex-col">
-        {isPlanned ? (
+        {isPlannedOrDraft ? (
           <div className="flex flex-col h-full">
             <AddParticipantForm 
               tournamentId={tournament.id} 

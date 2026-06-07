@@ -42,6 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
+    robots: tournament.is_test ? { index: false, follow: false } : undefined,
     openGraph: {
       title,
       description,
@@ -102,6 +103,16 @@ export default async function TournamentDetailPage({ params }: Props) {
       <AutoRedirect shortId={shortId} />
 
       <div className="container mx-auto px-4 py-8 max-w-5xl">
+
+        {tournament.is_test && (
+          <div className="mb-6 p-4 bg-amber-50/70 border border-amber-200/60 rounded-2xl flex items-center gap-3 text-amber-800">
+            <span className="text-xl">🧪</span>
+            <div className="flex flex-col">
+              <span className="text-sm font-bold text-amber-900">Entorno de Pruebas</span>
+              <span className="text-xs text-amber-800/90 font-medium">Este torneo es de prueba y no aparece en el mapa público.</span>
+            </div>
+          </div>
+        )}
 
         {/* Navegación al buscador/mapa de torneos */}
         <div className="mb-6">

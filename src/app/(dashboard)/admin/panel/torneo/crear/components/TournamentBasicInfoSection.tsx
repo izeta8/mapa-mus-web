@@ -12,7 +12,7 @@ interface TournamentBasicInfoSectionProps {
   onPriceChange: (v: string) => void;
   posterPreview: string | null;
   onPosterChange: (file: File) => void;
-  inputClass: string,
+  inputClass: string;
 }
 
 export function TournamentBasicInfoSection({

@@ -16,6 +16,7 @@ export function TournamentHeader({ tournament, shortId }: Props) {
   const isOngoing = tournament.status === "ongoing";
   const isFinished = tournament.status === "finished";
   const isEditable = tournament.status === "planned" || tournament.status === "revision_pending";
+  const isPlannedOrDraft = tournament.status === "planned" || tournament.status === "revision_pending";
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
@@ -31,6 +32,14 @@ export function TournamentHeader({ tournament, shortId }: Props) {
              tournament.status === "finished" ? "Finalizado" : 
              tournament.status === "revision_pending" ? "En Revisión" : "Cancelado"}
           </Badge>
+          {tournament.is_test && (
+            <Badge 
+              variant="outline"
+              className="px-3 py-1 text-sm font-bold bg-amber-50 text-amber-800 border-amber-200 uppercase tracking-wide"
+            >
+              🧪 Modo Prueba
+            </Badge>
+          )}
         </div>
         <div className="flex items-center gap-6 text-muted-foreground">
           <div className="flex items-center gap-2">
@@ -63,7 +72,7 @@ export function TournamentHeader({ tournament, shortId }: Props) {
             Modo TV
           </Button>
         </Link>
-        {isPlanned && (
+        {isPlannedOrDraft && (
           <StartTournamentButton 
             tournamentId={tournament.id} 
             couplesCount={tournament.couples.length} 

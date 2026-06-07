@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -282,6 +282,7 @@ export type Database = {
           current_round: number | null
           featured_until: string | null
           id: string
+          is_test: boolean
           kings_modality:
             | Database["public"]["Enums"]["kings_modality_enum"]
             | null
@@ -310,6 +311,7 @@ export type Database = {
           current_round?: number | null
           featured_until?: string | null
           id?: string
+          is_test?: boolean
           kings_modality?:
             | Database["public"]["Enums"]["kings_modality_enum"]
             | null
@@ -338,6 +340,7 @@ export type Database = {
           current_round?: number | null
           featured_until?: string | null
           id?: string
+          is_test?: boolean
           kings_modality?:
             | Database["public"]["Enums"]["kings_modality_enum"]
             | null

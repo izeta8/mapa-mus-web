@@ -68,6 +68,7 @@ export async function getPublicActiveTournaments(): Promise<Tournament[] | null>
     .from("tournaments")
     .select("*")
     .in("status", ["planned", "ongoing"])
+    .eq("is_test", false)
     .gte("tournament_date", thresholdDate)
     .order("tournament_date", { ascending: true });
 

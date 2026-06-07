@@ -77,6 +77,7 @@ export function TournamentForm({
   const [posterPreview, setPosterPreview] = useState<string | null>(
     mode === "edit" ? initialTournament?.poster_url || null : null
   );
+  const [isTest, setIsTest] = useState(mode === "edit" ? initialTournament?.is_test || false : false);
 
   // Location
   const [location, setLocation] = useState(
@@ -203,6 +204,7 @@ export function TournamentForm({
           rules,
           registrationDetails,
           status: isDraft ? "revision_pending" : undefined,
+          isTest,
         });
 
         if (res.success && res.shortId) {
@@ -234,6 +236,7 @@ export function TournamentForm({
           rules,
           registrationDetails,
           status: isDraft ? "revision_pending" : undefined,
+          isTest,
         });
 
         if (res.success && res.shortId) {
@@ -363,6 +366,26 @@ export function TournamentForm({
           />
         </FormSection>
 
+        {/* 7. Sandbox Mode */}
+        <div className="flex items-start gap-3 p-4 bg-amber-50/55 border border-amber-200/50 rounded-2xl">
+          <input
+            id="isTest"
+            type="checkbox"
+            checked={isTest}
+            onChange={(e) => setIsTest(e.target.checked)}
+            disabled={isPending}
+            className="rounded border-amber-300 text-amber-600 focus:ring-amber-500 w-4 h-4 mt-0.5 cursor-pointer"
+          />
+          <div className="flex flex-col gap-1">
+            <label htmlFor="isTest" className="text-sm font-bold text-amber-900 cursor-pointer">
+              Entorno de Pruebas
+            </label>
+            <span className="text-xs text-amber-800/80 leading-relaxed font-medium">
+              Al activar esta opción, el torneo no aparecerá en el mapa de torneos públicos. Podrás trastear y hacer todas las pruebas de cuadro de clasificación de forma privada.
+            </span>
+          </div>
+        </div>
+
         {/* Footer actions */}
         <div className="flex justify-between items-center pt-2">
           {/* Left: Delete Tournament (Only in Edit mode) */}
@@ -429,7 +452,7 @@ export function TournamentForm({
                       {isPending && saveType === "draft" ? (
                         <div className="w-5 h-5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mr-2" />
                       ) : null}
-                      Guardar como Borrador
+                      {isTest ? "Guardar Borrador de Prueba" : "Guardar como Borrador"}
                     </button>
                     <button
                       type="button"
@@ -443,7 +466,7 @@ export function TournamentForm({
                       {isPending && saveType === "publish" ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                       ) : (
-                        "Publicar Torneo"
+                        isTest ? "Guardar Torneo de Prueba" : "Publicar Torneo"
                       )}
                     </button>
                   </>
@@ -456,7 +479,7 @@ export function TournamentForm({
                     {isPending && saveType === "draft" ? (
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                     ) : null}
-                    Guardar como Borrador
+                    {isTest ? "Guardar Torneo de Prueba" : "Guardar como Borrador"}
                   </button>
                 )}
               </>
@@ -477,7 +500,7 @@ export function TournamentForm({
                   {isPending && saveType === "draft" ? (
                     <div className="w-5 h-5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mr-2" />
                   ) : null}
-                  Guardar como Borrador
+                  {isTest ? "Guardar Borrador de Prueba" : "Guardar como Borrador"}
                 </button>
                 <button
                   type="button"
@@ -491,9 +514,9 @@ export function TournamentForm({
                   {isPending && saveType === "publish" ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                   ) : mode === "create" ? (
-                    "Crear Torneo"
+                    isTest ? "Crear Torneo de Prueba" : "Crear Torneo"
                   ) : (
-                    "Guardar Cambios"
+                    isTest ? "Guardar Torneo de Prueba" : "Guardar Cambios"
                   )}
                 </button>
               </>
@@ -509,7 +532,7 @@ export function TournamentForm({
                 {isPending && saveType === "publish" ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                 ) : (
-                  "Guardar Cambios"
+                  isTest ? "Guardar Torneo de Prueba" : "Guardar Cambios"
                 )}
               </button>
             )}

@@ -91,7 +91,12 @@ export function TournamentGroupedList({
   };
 
   STATUS_ORDER.forEach((status) => {
-    grouped[status].sort((a, b) => getTimestamp(b.tournament_date) - getTimestamp(a.tournament_date));
+    grouped[status].sort((a, b) => {
+      if (a.is_test !== b.is_test) {
+        return a.is_test ? 1 : -1;
+      }
+      return getTimestamp(b.tournament_date) - getTimestamp(a.tournament_date);
+    });
   });
 
   return (
@@ -149,23 +154,36 @@ export function TournamentGroupedList({
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {list.map((tournament) => (
-                        <div
-                          key={tournament.id}
-                          className="relative flex flex-col h-full bg-white border border-zinc-200 rounded-2xl p-5 hover:shadow-md transition-all duration-200"
-                        >
+                      {list.map((tournament) => {
+                        const isTest = tournament.is_test;
+                        return (
+                          <div
+                            key={tournament.id}
+                            className={`relative flex flex-col h-full border rounded-2xl p-5 hover:shadow-md transition-all duration-200 ${
+                              isTest
+                                ? "bg-amber-50/15 border-amber-200/60 shadow-xs"
+                                : "bg-white border-zinc-200"
+                            }`}
+                          >
 
-                          {/* Card Header: Title & Status Badge */}
-                          <div className="flex justify-between items-start gap-3 mb-4">
-                            <h4 className="font-bold text-base sm:text-lg text-zinc-900 line-clamp-2 leading-snug">
-                              {tournament.name}
-                            </h4>
-                            <div className="flex items-center gap-2 shrink-0">
-                              <span
-                                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${BADGE_STYLES[status]}`}
-                              >
-                                {label}
-                              </span>
+                            {/* Card Header: Title & Status Badge */}
+                            <div className="flex justify-between items-start gap-3 mb-4">
+                              <h4 className="font-bold text-base sm:text-lg text-zinc-900 line-clamp-2 leading-snug">
+                                {tournament.name}
+                              </h4>
+                              <div className="flex items-center gap-2 shrink-0">
+                                {isTest && (
+                                  <span
+                                    className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200/60 uppercase tracking-wider"
+                                  >
+                                    Prueba
+                                  </span>
+                                )}
+                                <span
+                                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${BADGE_STYLES[status]}`}
+                                >
+                                  {label}
+                                </span>
                               <TournamentActionsDropdown
                                 tournamentId={tournament.id}
                                 tournamentShortId={tournament.short_id}
@@ -236,7 +254,8 @@ export function TournamentGroupedList({
                             </Link>
                           </div>
                         </div>
-                      ))}
+                      );
+                    })}
                     </div>
                   )}
                 </div>

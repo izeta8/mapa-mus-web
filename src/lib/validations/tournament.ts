@@ -33,4 +33,5 @@ export const TournamentSchema = z.object({
   rules: z.array(z.string()).optional().default([]),
   registrationDetails: z.string().optional().default(""),
   status: z.enum(["planned", "revision_pending", "finished", "canceled", "ongoing"]).optional(),
+  isTest: z.boolean().optional().default(false),
 });
