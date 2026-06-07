@@ -98,14 +98,14 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
   };
 
   const config = getLayoutConfig(rows);
-  
+
   return (
     <div className="h-screen w-screen bg-white text-black p-6 flex flex-col overflow-hidden select-none">
 
-      <TVHeader 
-        tournamentName={tournamentName} 
+      <TVHeader
+        tournamentName={tournamentName}
         viewMode={viewMode}
-        setViewMode={setViewMode} 
+        setViewMode={setViewMode}
         inscribedCouples={inscribedCouples}
         aliveCouples={aliveCouples}
         isBracketCreated={isBracketCreated}
@@ -127,7 +127,7 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
               Esperando las primeras inscripciones...
             </div>
           ) : (
-            <div 
+            <div
               className={`w-full flex-1 overflow-hidden grid grid-flow-col ${config.gapX} gap-y-2 pr-2 min-h-0`}
               style={{
                 gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
@@ -146,7 +146,7 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
                       gap: `clamp(0.5rem, 1.5vh, 2rem)`,
                     }}
                   >
-                    <span 
+                    <span
                       className="font-black text-white bg-[#33AD6A] flex items-center justify-center shrink-0 shadow-xs"
                       style={{
                         width: config.badgeSize,
@@ -157,23 +157,23 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
                     >
                       {couple.couple_number}
                     </span>
-                    <div 
+                    <div
                       className="flex items-center min-w-0 flex-1"
                       style={{ gap: `calc(${config.fontSize} * 0.4)` }}
                     >
-                      <span 
+                      <span
                         className="font-black text-zinc-950 truncate"
                         style={{ fontSize: config.fontSize }}
                       >
                         {couple.player1_name || "—"}
                       </span>
-                      <span 
+                      <span
                         className="font-black text-zinc-400 shrink-0"
                         style={{ fontSize: config.connectorSize }}
                       >
                         y
                       </span>
-                      <span 
+                      <span
                         className="font-black text-zinc-950 truncate"
                         style={{ fontSize: config.fontSize }}
                       >
@@ -187,16 +187,16 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
         </div>
       ) : (
         <>
-        <div className="flex-1 overflow-hidden">
-          {viewMode === "matchup" ? (
-            <TVMatchupView matches={matches} tournament={tournament} />
-          ) : (
-            <TVBracketView 
-              matches={matches} 
-              activeRound={tournament.current_round || Math.max(...matches.map(m => m.round), 1)} 
-            />
-          )}
-        </div>
+          <div className="flex-1 overflow-hidden">
+            {viewMode === "matchup" ? (
+              <TVMatchupView matches={matches} tournament={tournament} />
+            ) : (
+              <TVBracketView
+                matches={matches}
+                activeRound={tournament.current_round || Math.max(...matches.map(m => m.round), 1)}
+              />
+            )}
+          </div>
         </>
 
       )}

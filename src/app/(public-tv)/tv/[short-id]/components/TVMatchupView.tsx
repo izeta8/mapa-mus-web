@@ -3,12 +3,26 @@
 import { useState, useEffect } from "react";
 import { getFontSize } from "../helpers";
 import { MatchWithCouples, TournamentFull } from "@/types/database";
-import { MatchupCardStyles } from "@/types";
 
 interface Props {
   matches: MatchWithCouples[],
   tournament: TournamentFull,
 }
+
+const getGridDimensions = (count: number) => {
+  if (count <= 1) return { cols: 1, rows: 1 };
+  if (count <= 2) return { cols: 2, rows: 1 };
+  if (count <= 4) return { cols: 2, rows: 2 };
+  if (count <= 6) return { cols: 3, rows: 2 };
+  if (count <= 8) return { cols: 4, rows: 2 };
+  if (count <= 12) return { cols: 4, rows: 3 };
+  if (count <= 16) return { cols: 4, rows: 4 };
+  if (count <= 20) return { cols: 5, rows: 4 };
+  if (count <= 24) return { cols: 6, rows: 4 };
+  const cols = Math.ceil(Math.sqrt(count * 1.5));
+  const rows = Math.ceil(count / cols);
+  return { cols, rows };
+};
 
 export default function TVMatchupView({ matches, tournament }: Props) {
 
@@ -35,20 +49,25 @@ export default function TVMatchupView({ matches, tournament }: Props) {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  const playingMatchStyles = getFontSize(playingMatches.length, "partido", dimensions.width, dimensions.height * 0.65);
   const byeMatchStyles = getFontSize(byes.length, "bye", dimensions.width, dimensions.height);
+  const { cols, rows } = getGridDimensions(playingMatches.length);
+  const gridTemplateRows = byes.length > 0 ? "65% 35%" : "1fr";
 
   return (
-    <div className="h-full w-full flex flex-col" style={{ display: "grid", gridTemplateRows: "65% 35%", gridTemplateColumns: "1fr", gap: "8px", padding: "8px" }}>
+    <div className="h-full w-full flex flex-col" style={{ display: "grid", gridTemplateRows, gridTemplateColumns: "1fr", gap: "8px", padding: "8px" }}>
 
       {/* PLAYING COUPLES - 70% */}
-      <div className="flex flex-wrap gap-3 justify-evenly items-center content-center h-full">
+      <div
+        className="grid justify-center items-center w-full h-full gap-4 p-2 overflow-hidden min-h-0"
+        style={{
+          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+          gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+        }}
+      >
         {playingMatches.map((match) => (
-          <MatchupCard
-            key={match.id}
-            match={match}
-            playingMatchStyles={playingMatchStyles}
-          />
+          <div key={match.id} className="w-full h-full flex items-center justify-center overflow-hidden min-h-0 min-w-0">
+            <MatchupCard match={match} />
+          </div>
         ))}
       </div>
 
@@ -59,16 +78,16 @@ export default function TVMatchupView({ matches, tournament }: Props) {
           {/* BYES CONTAINER */}
           <div className="border-4 border-black bg-zinc-100 p-3 flex-1 flex flex-col">
             <div className="bg-zinc-800 text-white px-4 py-1 mb-2 shrink-0">
-              <span className="text-m font-black">PASAN DIRECTO</span>
+              <span className="text-xl font-black">PASAN DIRECTO</span>
               <span className="text-sm font-black text-zinc-300 italic"> ({byes.length} PAREJAS)</span>
             </div>
-            <div className="flex flex-wrap gap-2 overflow-hidden justify-center items-center h-full">
+            <div className="flex flex-wrap gap-4 overflow-hidden justify-center items-center h-full">
               {byes.map((bye) => (
                 <div
                   key={bye.id}
                   className={`border border-zinc-400 bg-white text-center ${byeMatchStyles.container}`}
                 >
-                  <span className={`font-black text-zinc-800 text-xl ${byeMatchStyles.numero}`}>{bye.couple1?.couple_number}</span>
+                  <span className={`font-black text-zinc-800 text-3xl ${byeMatchStyles.numero}`}>{bye.couple1?.couple_number}</span>
                 </div>
               ))}
             </div>
@@ -91,14 +110,13 @@ export default function TVMatchupView({ matches, tournament }: Props) {
 }
 
 interface MatchupCardProps {
-  match: MatchWithCouples,
-  playingMatchStyles: MatchupCardStyles
+  match: MatchWithCouples
 }
 
-export const MatchupCard = ({ match, playingMatchStyles }: MatchupCardProps) => {
+export const MatchupCard = ({ match }: MatchupCardProps) => {
 
   if (match.couple1 === null && match.couple2 === null) {
-    return
+    return null;
   }
 
   const hasWinner = !!match.winner_id;
@@ -138,28 +156,49 @@ export const MatchupCard = ({ match, playingMatchStyles }: MatchupCardProps) => 
   }
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center justify-center w-full h-full max-w-[380px] max-h-[253px] aspect-[3/2] overflow-hidden select-none p-1">
       {isRound1 && badgeText && (
-        <span className={`px-3 py-1 rounded-full border font-black uppercase tracking-wide text-center shrink-0 ${badgeStyles} ${playingMatchStyles.badge}`}>
+        <span
+          className={`px-3 py-0.5 rounded-full border font-black uppercase tracking-wide text-center shrink-0 mb-1 ${badgeStyles}`}
+          style={{ fontSize: "clamp(10px, 3cqw, 20px)" }}
+        >
           {badgeText}
         </span>
       )}
       <div
-        className={`flex flex-col items-center justify-center border-2 ${cardBorderClass} bg-white shadow-md aspect-3/2 transition-all duration-500 ${playingMatchStyles.container}`}
-        style={splitBackground}
+        className={`flex flex-col items-center justify-center border-2 ${cardBorderClass} bg-white shadow-md aspect-[3/2] w-full h-full transition-all duration-500`}
+        style={{
+          containerType: "size",
+          ...splitBackground,
+        }}
       >
-        <div className={`font-bold ${hasWinner ? 'text-zinc-700' : 'text-zinc-400'} mb-1 ${playingMatchStyles.mesa}`}>MESA {match.table_number}</div>
-        <div className="grid grid-cols-3 text-center items-center gap-3">
-          <span className={`font-black text-zinc-900 ${playingMatchStyles.numero} transition-transform`}>
+        <div
+          className={`font-bold ${hasWinner ? 'text-zinc-700' : 'text-zinc-400'} mb-1`}
+          style={{ fontSize: "8cqw", lineHeight: 1 }}
+        >
+          MESA {match.table_number}
+        </div>
+        <div className="grid grid-cols-3 text-center items-center w-full" style={{ gap: "2cqw" }}>
+          <span
+            className="font-black text-zinc-900 transition-transform truncate px-1"
+            style={{ fontSize: "18cqw", lineHeight: 1 }}
+          >
             {match.couple1?.couple_number}
           </span>
-          <span className={`font-bold  ${playingMatchStyles.vs} ${hasWinner ? 'text-zinc-600' : 'text-zinc-300'} `}>vs</span>
-          <span className={`font-black text-zinc-900 ${playingMatchStyles.numero} transition-transform`}>
+          <span
+            className={`font-bold ${hasWinner ? 'text-zinc-600' : 'text-zinc-300'}`}
+            style={{ fontSize: "8cqw", lineHeight: 1 }}
+          >
+            vs
+          </span>
+          <span
+            className="font-black text-zinc-900 transition-transform truncate px-1"
+            style={{ fontSize: "18cqw", lineHeight: 1 }}
+          >
             {match.couple2?.couple_number}
           </span>
         </div>
       </div>
     </div>
   )
-
 }
