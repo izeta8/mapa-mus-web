@@ -66,6 +66,18 @@ export function useTournamentRealtime(initialTournament: TournamentFull) {
           refreshTournamentData();
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'couples',
+          filter: `tournament_id=eq.${initialTournament.id}`
+        },
+        () => {
+          refreshTournamentData();
+        }
+      )
       .subscribe();
 
     return () => {

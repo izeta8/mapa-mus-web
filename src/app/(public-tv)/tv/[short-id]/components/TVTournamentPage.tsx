@@ -31,9 +31,76 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
     }
   });
   const aliveCouples = inscribedCouples - eliminatedCoupleIds.size;
+
+  // Dynamic layout & sizes based on couples count to prevent vertical scroll
+  const cols = inscribedCouples <= 2 ? 1 : inscribedCouples <= 8 ? 2 : inscribedCouples <= 12 ? 3 : inscribedCouples <= 32 ? 4 : inscribedCouples <= 40 ? 5 : 6;
+  const rows = Math.max(1, Math.ceil(inscribedCouples / cols));
+
+  const getLayoutConfig = (r: number) => {
+    if (r <= 2) {
+      return {
+        fontSize: "4.5vh",
+        connectorSize: "3vh",
+        badgeSize: "7.5vh",
+        padding: "1.5vh",
+        gapX: "gap-x-12",
+        borderWidth: "border-b-4",
+      };
+    }
+    if (r <= 4) {
+      return {
+        fontSize: "3.5vh",
+        connectorSize: "2.2vh",
+        badgeSize: "6vh",
+        padding: "1.2vh",
+        gapX: "gap-x-10",
+        borderWidth: "border-b-2",
+      };
+    }
+    if (r <= 6) {
+      return {
+        fontSize: "2.8vh",
+        connectorSize: "1.8vh",
+        badgeSize: "5vh",
+        padding: "0.8vh",
+        gapX: "gap-x-8",
+        borderWidth: "border-b-2",
+      };
+    }
+    if (r <= 8) {
+      return {
+        fontSize: "2.2vh",
+        connectorSize: "1.4vh",
+        badgeSize: "4.0vh",
+        padding: "0.6vh",
+        gapX: "gap-x-6",
+        borderWidth: "border-b",
+      };
+    }
+    if (r <= 10) {
+      return {
+        fontSize: "1.8vh",
+        connectorSize: "1.2vh",
+        badgeSize: "3.2vh",
+        padding: "0.4vh",
+        gapX: "gap-x-4",
+        borderWidth: "border-b",
+      };
+    }
+    return {
+      fontSize: "1.4vh",
+      connectorSize: "1vh",
+      badgeSize: "2.6vh",
+      padding: "0.3vh",
+      gapX: "gap-x-3",
+      borderWidth: "border-b",
+    };
+  };
+
+  const config = getLayoutConfig(rows);
   
   return (
-    <div className="h-screen bg-zinc-50 text-black p-4 flex flex-col ">
+    <div className="h-screen w-screen bg-white text-black p-6 flex flex-col overflow-hidden select-none">
 
       <TVHeader 
         tournamentName={tournamentName} 
@@ -45,8 +112,78 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
       />
 
       {!isBracketCreated ? (
-        <div className=" h-full w-full flex justify-center items-center">
-          <a className="text-3xl">El cuadro no ha sido generado</a>
+        <div className="flex-1 flex flex-col items-stretch justify-start py-2 mt-1 overflow-hidden bg-white min-h-0">
+          <div className="flex flex-col items-center justify-center mb-4 shrink-0 w-full text-center">
+            <h2 className="text-3xl font-black text-zinc-900 uppercase tracking-wide">
+              Parejas Inscritas
+            </h2>
+            <p className="text-sm font-semibold text-zinc-500 mt-1">
+              Esperando a que el organizador inicie el sorteo del cuadro...
+            </p>
+          </div>
+
+          {inscribedCouples === 0 ? (
+            <div className="flex-1 w-full flex flex-col justify-center items-center text-zinc-400 font-bold text-2xl animate-pulse">
+              Esperando las primeras inscripciones...
+            </div>
+          ) : (
+            <div 
+              className={`w-full flex-1 overflow-hidden grid grid-flow-col ${config.gapX} gap-y-2 pr-2 min-h-0`}
+              style={{
+                gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+                gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+              }}
+            >
+              {[...tournament.couples]
+                .sort((a, b) => a.couple_number - b.couple_number)
+                .map((couple) => (
+                  <div
+                    key={couple.id}
+                    className={`${config.borderWidth} border-zinc-100 flex items-center min-w-0`}
+                    style={{
+                      paddingTop: config.padding,
+                      paddingBottom: config.padding,
+                      gap: `clamp(0.5rem, 1.5vh, 2rem)`,
+                    }}
+                  >
+                    <span 
+                      className="font-black text-white bg-[#33AD6A] flex items-center justify-center shrink-0 shadow-xs"
+                      style={{
+                        width: config.badgeSize,
+                        height: config.badgeSize,
+                        fontSize: `calc(${config.fontSize} * 1.1)`,
+                        borderRadius: `calc(${config.badgeSize} * 0.25)`,
+                      }}
+                    >
+                      {couple.couple_number}
+                    </span>
+                    <div 
+                      className="flex items-center min-w-0 flex-1"
+                      style={{ gap: `calc(${config.fontSize} * 0.4)` }}
+                    >
+                      <span 
+                        className="font-black text-zinc-950 truncate"
+                        style={{ fontSize: config.fontSize }}
+                      >
+                        {couple.player1_name || "—"}
+                      </span>
+                      <span 
+                        className="font-black text-zinc-400 shrink-0"
+                        style={{ fontSize: config.connectorSize }}
+                      >
+                        y
+                      </span>
+                      <span 
+                        className="font-black text-zinc-950 truncate"
+                        style={{ fontSize: config.fontSize }}
+                      >
+                        {couple.player2_name || "—"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
       ) : (
         <>

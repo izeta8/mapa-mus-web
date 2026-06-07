@@ -35,7 +35,7 @@ export default function TVMatchupView({matches, tournament}: Props) {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  const playingMatchStyles = getFontSize(playingMatches.length, "partido", dimensions.width);
+  const playingMatchStyles = getFontSize(playingMatches.length, "partido", dimensions.width, dimensions.height * 0.65);
   const byeMatchStyles     = getFontSize(byes.length, "bye", dimensions.width, dimensions.height);
 
   return (

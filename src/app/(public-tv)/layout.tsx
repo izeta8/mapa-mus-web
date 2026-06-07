@@ -4,7 +4,7 @@ export default function PublicTVLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="h-screen w-screen overflow-hidden bg-white text-zinc-950">
       {children}
     </div>
   );
