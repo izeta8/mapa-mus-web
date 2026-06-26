@@ -113,15 +113,6 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
 
       {!isBracketCreated ? (
         <div className="flex-1 flex flex-col items-stretch justify-start py-2 mt-1 overflow-hidden bg-white min-h-0">
-          <div className="flex flex-col items-center justify-center mb-4 shrink-0 w-full text-center">
-            <h2 className="text-3xl font-black text-zinc-900 uppercase tracking-wide">
-              Parejas Inscritas
-            </h2>
-            <p className="text-sm font-semibold text-zinc-500 mt-1">
-              Esperando a que el organizador inicie el sorteo del cuadro...
-            </p>
-          </div>
-
           {inscribedCouples === 0 ? (
             <div className="flex-1 w-full flex flex-col justify-center items-center text-zinc-400 font-bold text-2xl animate-pulse">
               Esperando las primeras inscripciones...
