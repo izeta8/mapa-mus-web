@@ -303,6 +303,7 @@ export type Database = {
           short_id: string
           status: Database["public"]["Enums"]["tournament_status"]
           tournament_date: string
+          tv_view_mode: Database["public"]["Enums"]["tv_view_mode_enum"]
           updated_at: string
         }
         Insert: {
@@ -332,6 +333,7 @@ export type Database = {
           short_id?: string
           status: Database["public"]["Enums"]["tournament_status"]
           tournament_date: string
+          tv_view_mode?: Database["public"]["Enums"]["tv_view_mode_enum"]
           updated_at?: string
         }
         Update: {
@@ -361,6 +363,7 @@ export type Database = {
           short_id?: string
           status?: Database["public"]["Enums"]["tournament_status"]
           tournament_date?: string
+          tv_view_mode?: Database["public"]["Enums"]["tv_view_mode_enum"]
           updated_at?: string
         }
         Relationships: [
@@ -418,6 +421,7 @@ export type Database = {
         | "finished"
         | "canceled"
         | "ongoing"
+      tv_view_mode_enum: "matchup" | "bracket"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -555,6 +559,7 @@ export const Constants = {
         "canceled",
         "ongoing",
       ],
+      tv_view_mode_enum: ["matchup", "bracket"],
     },
   },
 } as const

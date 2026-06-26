@@ -5,6 +5,7 @@ import Link from "next/link";
 import { TournamentFull } from "@/types/database";
 import { StartTournamentButton } from "./StartTournamentButton";
 import { ResetTournamentButton } from "./ResetTournamentButton";
+import { TvViewModeToggle } from "./TvViewModeToggle";
 import { SafeDate } from "@/components/ui/custom/SafeDate";
 
 interface Props {
@@ -18,6 +19,7 @@ export function TournamentHeader({ tournament, shortId }: Props) {
   const isFinished = tournament.status === "finished";
   const isEditable = tournament.status === "planned" || tournament.status === "revision_pending";
   const isPlannedOrDraft = tournament.status === "planned" || tournament.status === "revision_pending";
+  const isBracketCreated = tournament.matches.length > 0;
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
@@ -66,6 +68,9 @@ export function TournamentHeader({ tournament, shortId }: Props) {
               Editar
             </Button>
           </Link>
+        )}
+        {isBracketCreated && (
+          <TvViewModeToggle tournamentId={tournament.id} currentMode={tournament.tv_view_mode} />
         )}
         <Link href={`/tv/${shortId}`} target="_blank">
           <Button variant="outline" size="lg" className="h-12 px-6 text-base cursor-pointer">

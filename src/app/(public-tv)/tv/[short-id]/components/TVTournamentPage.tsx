@@ -1,11 +1,12 @@
 "use client"
 
-import { ViewMode, TournamentFull } from "@/types/database";
+import { TournamentFull } from "@/types/database";
 import TVBracketView from "./TVBracketView";
 import TVHeader from "./TVHeader";
 import TVMatchupView from "./TVMatchupView";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { useTournamentRealtime } from "../hooks/use-tournament-realtime";
+import { setTvViewMode } from "@/app/actions/tournaments";
 
 interface Props {
   tournament: TournamentFull
@@ -18,9 +19,22 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
   const inscribedCouples = tournament.couples.length;
   const tournamentName = tournament.name;
 
-  const [viewMode, setViewMode] = useState<ViewMode>("matchup");
-  // const [viewMode, setViewMode] = useState<ViewMode>(shouldShowMatchupView ? "matchup" : "bracket");
+  // Persisted in the DB so the view mode survives a TV browser refresh and can be
+  // controlled remotely from the admin panel.
+  const viewMode = tournament.tv_view_mode;
   const isBracketCreated = matches && matches.length > 0;
+
+  // current_round counts down from the final (1 = Final, 2 = Semifinal, 3 = Cuartos, 4 = Octavos)
+  const previousRoundRef = useRef(tournament.current_round);
+  useEffect(() => {
+    const previousRound = previousRoundRef.current;
+    previousRoundRef.current = tournament.current_round;
+    if (previousRound === 4 && tournament.current_round === 3) {
+      setTvViewMode(tournament.id, "bracket");
+    } else if (previousRound === 3 && tournament.current_round === 4) {
+      setTvViewMode(tournament.id, "matchup");
+    }
+  }, [tournament.id, tournament.current_round]);
 
   // Calcular parejas vivas
   const eliminatedCoupleIds = new Set<string>();
@@ -105,7 +119,6 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
       <TVHeader
         tournamentName={tournamentName}
         viewMode={viewMode}
-        setViewMode={setViewMode}
         inscribedCouples={inscribedCouples}
         aliveCouples={aliveCouples}
         isBracketCreated={isBracketCreated}

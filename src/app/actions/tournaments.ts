@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { TournamentSchema } from "@/lib/validations/tournament";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "@/types/supabase";
+import { ViewMode } from "@/types/database";
 import { sendTelegramNotification } from "@/lib/telegram";
 
 export async function verifyTournamentOwnership(supabase: SupabaseClient<Database>, tournamentId: string) {
@@ -324,6 +325,28 @@ export async function revertTournamentRound(tournamentId: string, round: number)
   }
 
   revalidatePath(`/admin/panel/[short-id]`, 'page');
+  return { success: true };
+}
+
+export async function setTvViewMode(tournamentId: string, mode: ViewMode) {
+  const supabase = await createClient();
+
+  const isOwner = await verifyTournamentOwnership(supabase, tournamentId);
+  if (!isOwner) {
+    return { success: false, error: "No autorizado para modificar este torneo." };
+  }
+
+  const { error } = await supabase
+    .from('tournaments')
+    .update({ tv_view_mode: mode })
+    .eq('id', tournamentId);
+
+  if (error) {
+    console.error("Error setting TV view mode:", error);
+    return { success: false, error: "No se pudo cambiar el modo de vista de la TV. Inténtalo de nuevo." };
+  }
+
+  revalidatePath(`/admin/panel/torneo/[short-id]`, 'page');
   return { success: true };
 }
 

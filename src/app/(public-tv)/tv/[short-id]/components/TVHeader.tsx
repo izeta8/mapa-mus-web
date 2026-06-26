@@ -1,11 +1,10 @@
 import { ViewMode } from "@/types/database";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { icons, Network, StretchHorizontal } from "lucide-react";
+import { Network, StretchHorizontal } from "lucide-react";
 
 interface TVHeaderProps {
   tournamentName: string;
   viewMode: ViewMode;
-  setViewMode: (viewMode: ViewMode) => void;
   inscribedCouples: number;
   aliveCouples: number;
   isBracketCreated: boolean;
@@ -13,11 +12,10 @@ interface TVHeaderProps {
 
 interface TVModeSelectorProps {
   viewMode: ViewMode;
-  setViewMode: (viewMode: ViewMode) => void;
 }
 
 
-export default function TVHeader({ tournamentName, viewMode, setViewMode, inscribedCouples, aliveCouples, isBracketCreated }: TVHeaderProps) {
+export default function TVHeader({ tournamentName, viewMode, inscribedCouples, aliveCouples, isBracketCreated }: TVHeaderProps) {
 
   return (
     <header className="relative flex justify-between items-center shrink-0 mb-6 w-full">
@@ -47,7 +45,7 @@ export default function TVHeader({ tournamentName, viewMode, setViewMode, inscri
       )}
 
       {isBracketCreated && (
-        <TVModeSelector viewMode={viewMode} setViewMode={setViewMode} />
+        <TVModeSelector viewMode={viewMode} />
       )}
 
     </header>
@@ -55,32 +53,26 @@ export default function TVHeader({ tournamentName, viewMode, setViewMode, inscri
 
 }
 
-function TVModeSelector({ viewMode, setViewMode }: TVModeSelectorProps) {
+// Read-only indicator of the current TV view mode.
+// The TV screen is a passive display (AGENTS.md); the mode is controlled from the admin panel.
+function TVModeSelector({ viewMode }: TVModeSelectorProps) {
 
-  const labelStyle = "px-5 py-5 text-xl flex items-center gap-4 pointer cursor-pointer rounded-xl transition-all"
+  const labelStyle = "px-5 py-5 text-xl flex items-center gap-4 rounded-xl transition-all"
   const iconStyle = "w-5 h-5 size-5 shrink-0"
 
   return (
 
-    <Tabs defaultValue={viewMode}>
-      <TabsList className="py-6 bg-zinc-100 rounded-2xl transition-all">
+    <Tabs value={viewMode}>
+      <TabsList className="py-6 bg-zinc-100 rounded-2xl transition-all pointer-events-none">
 
         {/* PAREJAS */}
-        <TabsTrigger
-          value="matchup"
-          className={labelStyle}
-          onClick={() => setViewMode("matchup")}
-        >
+        <TabsTrigger value="matchup" className={labelStyle}>
           <StretchHorizontal className={iconStyle} />
           Enfrentamientos
         </TabsTrigger>
 
         {/* CUADRO */}
-        <TabsTrigger
-          value="bracket"
-          className={labelStyle}
-          onClick={() => setViewMode("bracket")}
-        >
+        <TabsTrigger value="bracket" className={labelStyle}>
           <Network className={iconStyle} />
           Cuadro
         </TabsTrigger>

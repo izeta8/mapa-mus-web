@@ -1,6 +1,6 @@
 import { Database } from '@/types/supabase'
 
-export type ViewMode = "matchup" | "bracket";
+export type ViewMode = Database['public']['Enums']['tv_view_mode_enum'];
 
 export type Match = Database['public']['Tables']['matches']['Row']
 export type Tournament = Database['public']['Tables']['tournaments']['Row']
