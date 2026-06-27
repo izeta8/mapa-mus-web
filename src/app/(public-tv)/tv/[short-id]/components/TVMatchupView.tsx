@@ -52,7 +52,7 @@ export default function TVMatchupView({ matches, tournament }: Props) {
 
   const byeMatchStyles = getFontSize(byes.length, "bye", dimensions.width, dimensions.height);
   const { cols, rows } = getGridDimensions(playingMatches.length);
-  const gridTemplateRows = byes.length > 0 ? "65% 35%" : "1fr auto";
+  const gridTemplateRows = byes.length > 0 ? "72% 28%" : "1fr auto";
 
   return (
     <div className="h-full w-full flex flex-col" style={{ display: "grid", gridTemplateRows, gridTemplateColumns: "1fr", gap: "8px", padding: "8px" }}>
@@ -97,9 +97,9 @@ export default function TVMatchupView({ matches, tournament }: Props) {
           <div className="flex-1" />
         )}
 
-        {/* The QR sits in its own column, bottom-aligned, so it never covers the byes list */}
-        <div className="shrink-0 self-end">
-          <TournamentQr shortId={tournament.short_id} />
+        {/* The QR sits in its own column and stretches to match the byes box height */}
+        <div className="shrink-0 flex">
+          <TournamentQr shortId={tournament.short_id} size={150} className="h-full justify-center" />
         </div>
 
       </div>
