@@ -72,11 +72,12 @@ export default function TVMatchupView({ matches, tournament }: Props) {
         ))}
       </div>
 
-      {/* BOTTOM ROW: byes (when present) + always-visible acquisition QR in its own column */}
-      <div className="flex gap-4 overflow-hidden">
+      {/* BOTTOM ROW: byes (when present) + always-visible acquisition QR.
+          With byes the QR sits beside the list; without byes it is centered. */}
+      {byes.length > 0 ? (
+        <div className="flex gap-4 overflow-hidden">
 
-        {byes.length > 0 ? (
-          /* BYES CONTAINER */
+          {/* BYES CONTAINER */}
           <div className="border-4 border-black bg-zinc-100 p-3 flex-1 flex flex-col">
             <div className="bg-zinc-800 text-white px-4 py-1 mb-2 shrink-0">
               <span className="text-xl font-black">PASAN DIRECTO</span>
@@ -93,16 +94,18 @@ export default function TVMatchupView({ matches, tournament }: Props) {
               ))}
             </div>
           </div>
-        ) : (
-          <div className="flex-1" />
-        )}
 
-        {/* The QR sits in its own column and stretches to match the byes box height */}
-        <div className="shrink-0 flex">
-          <TournamentQr shortId={tournament.short_id} size={150} className="h-full justify-center" />
+          {/* The QR stretches to match the byes box height */}
+          <div className="shrink-0 flex">
+            <TournamentQr shortId={tournament.short_id} size={150} className="h-full justify-center" />
+          </div>
+
         </div>
-
-      </div>
+      ) : (
+        <div className="flex justify-center items-center overflow-hidden">
+          <TournamentQr shortId={tournament.short_id} size={150} />
+        </div>
+      )}
 
     </div>
   );
