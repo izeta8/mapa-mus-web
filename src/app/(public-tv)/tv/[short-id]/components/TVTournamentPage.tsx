@@ -5,8 +5,9 @@ import TVBracketView from "./TVBracketView";
 import TVHeader from "./TVHeader";
 import TVMatchupView from "./TVMatchupView";
 import { useEffect, useRef } from "react";
-import { useTournamentRealtime } from "../hooks/use-tournament-realtime";
+import { useTournamentRealtime } from "@/hooks/use-tournament-realtime";
 import { setTvViewMode } from "@/app/actions/tournaments";
+import { TournamentQr } from "./TournamentQr";
 
 interface Props {
   tournament: TournamentFull
@@ -114,7 +115,7 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
   const config = getLayoutConfig(rows);
 
   return (
-    <div className="h-screen w-screen bg-white text-black p-6 flex flex-col overflow-hidden select-none">
+    <div className="relative h-screen w-screen bg-white text-black p-6 flex flex-col overflow-hidden select-none">
 
       <TVHeader
         tournamentName={tournamentName}
@@ -204,6 +205,11 @@ export default function TVTournamentPage({ tournament: initialTournament }: Prop
         </>
 
       )}
+
+      {/* Always-visible acquisition QR: scanning opens the player's "find your table" view. */}
+      <div className="absolute bottom-6 right-6 z-20">
+        <TournamentQr shortId={tournament.short_id} />
+      </div>
 
     </div>
   );

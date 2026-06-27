@@ -93,15 +93,6 @@ export default function TVMatchupView({ matches, tournament }: Props) {
             </div>
           </div>
 
-          {/* QR CONTAINER */}
-          <div className="w-36 shrink-0 flex flex-col items-center justify-center gap-2 border-4 border-black bg-white p-2">
-            <div className="w-28 h-28 border-2 border-black flex items-center justify-center">
-              <span className="text-xl font-bold text-zinc-400">QR</span>
-            </div>
-            <span className="text-xs font-black text-center">ESCÁNEAME</span>
-            <span className="text-sm font-bold  text-zinc-500 text-center">Busca tu mesa en la app</span>
-          </div>
-
         </div>
       )}
 

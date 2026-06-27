@@ -8,6 +8,7 @@ import { Prize, Contact } from '@/types';
 // Import subcomponents (colocados localmente bajo la ruta)
 import { AutoRedirect } from './components/AutoRedirect';
 import { AppPromoBanner } from './components/AppPromoBanner';
+import { LiveTablePanel } from './components/LiveTablePanel';
 import { TournamentPoster } from './components/TournamentPoster';
 import { TournamentSpecsCard } from './components/TournamentSpecsCard';
 import { PrizesList } from './components/PrizesList';
@@ -124,6 +125,11 @@ export default async function TournamentDetailPage({ params }: Props) {
             Ver el mapa de los torneos
           </Link>
         </div>
+
+        {/* Panel "tu mesa en vivo": solo durante el torneo, como héroe sobre la info. */}
+        {tournament.status === 'ongoing' && (
+          <LiveTablePanel initialTournament={tournament} />
+        )}
 
         {/* Banner de Aviso de App Móvil */}
         <AppPromoBanner shortId={shortId} />

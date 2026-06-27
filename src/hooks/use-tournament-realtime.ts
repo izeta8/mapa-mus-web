@@ -2,6 +2,13 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { TournamentFull } from "@/types/database";
 
+/**
+ * Subscribes to live changes of a tournament (matches, couples and the tournament
+ * row itself) and keeps an up-to-date `TournamentFull` in state.
+ *
+ * Shared by the public TV view and the player-facing "find your table" panel, so it
+ * lives in the shared `hooks/` folder instead of being colocated with a single route.
+ */
 export function useTournamentRealtime(initialTournament: TournamentFull) {
   const [tournament, setTournament] = useState<TournamentFull>(initialTournament);
 
@@ -41,7 +48,7 @@ export function useTournamentRealtime(initialTournament: TournamentFull) {
     };
 
     const channel = supabase
-      .channel(`tv-tournament-${initialTournament.id}`)
+      .channel(`tournament-realtime-${initialTournament.id}`)
       .on(
         'postgres_changes',
         {
