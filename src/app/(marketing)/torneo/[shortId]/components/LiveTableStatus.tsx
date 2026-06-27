@@ -56,9 +56,7 @@ function StatusBody({ status }: { status: CoupleLiveStatus }) {
           </p>
           {status.opponent && (
             <p className="text-sm font-semibold text-white/90">
-              Contra: {status.opponent.player1_name?.trim() || "Jugador 1"}
-              {" - "}
-              {status.opponent.player2_name?.trim() || "Jugador 2"}
+              Contra: {formatCoupleLabel(status.opponent)}
             </p>
           )}
         </div>
