@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { getFontSize } from "../helpers";
 import { MatchWithCouples, TournamentFull } from "@/types/database";
+import { TournamentQr } from "./TournamentQr";
 
 interface Props {
   matches: MatchWithCouples[],
@@ -51,7 +52,7 @@ export default function TVMatchupView({ matches, tournament }: Props) {
 
   const byeMatchStyles = getFontSize(byes.length, "bye", dimensions.width, dimensions.height);
   const { cols, rows } = getGridDimensions(playingMatches.length);
-  const gridTemplateRows = byes.length > 0 ? "65% 35%" : "1fr";
+  const gridTemplateRows = byes.length > 0 ? "65% 35%" : "1fr auto";
 
   return (
     <div className="h-full w-full flex flex-col" style={{ display: "grid", gridTemplateRows, gridTemplateColumns: "1fr", gap: "8px", padding: "8px" }}>
@@ -71,11 +72,11 @@ export default function TVMatchupView({ matches, tournament }: Props) {
         ))}
       </div>
 
-      {/* BYES COUPLES - 30% */}
-      {byes.length > 0 && (
-        <div className="flex gap-4 overflow-hidden">
+      {/* BOTTOM ROW: byes (when present) + always-visible acquisition QR in its own column */}
+      <div className="flex gap-4 overflow-hidden">
 
-          {/* BYES CONTAINER */}
+        {byes.length > 0 ? (
+          /* BYES CONTAINER */
           <div className="border-4 border-black bg-zinc-100 p-3 flex-1 flex flex-col">
             <div className="bg-zinc-800 text-white px-4 py-1 mb-2 shrink-0">
               <span className="text-xl font-black">PASAN DIRECTO</span>
@@ -92,9 +93,16 @@ export default function TVMatchupView({ matches, tournament }: Props) {
               ))}
             </div>
           </div>
+        ) : (
+          <div className="flex-1" />
+        )}
 
+        {/* The QR sits in its own column, bottom-aligned, so it never covers the byes list */}
+        <div className="shrink-0 self-end">
+          <TournamentQr shortId={tournament.short_id} />
         </div>
-      )}
+
+      </div>
 
     </div>
   );

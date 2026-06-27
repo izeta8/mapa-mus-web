@@ -3,10 +3,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MatchWithCouples } from "@/types";
 import BracketMatchCard from "./BracketMatchCard";
+import { TournamentQr } from "./TournamentQr";
 
 interface Props {
   matches: MatchWithCouples[];
   activeRound: number;
+  shortId: string;
 }
 
 interface SVGConnection {
@@ -34,7 +36,7 @@ const getRoundLabel = (round: number, totalRounds: number): string => {
 };
 
 
-export default function TVBracketView({ matches, activeRound }: Props) {
+export default function TVBracketView({ matches, activeRound, shortId }: Props) {
   const [connections, setConnections] = useState<SVGConnection[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -289,6 +291,11 @@ export default function TVBracketView({ matches, activeRound }: Props) {
           );
         });
       })()}
+
+      {/* Acquisition QR centered at the bottom, over the empty central space. */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
+        <TournamentQr shortId={shortId} />
+      </div>
     </div>
   );
 }
